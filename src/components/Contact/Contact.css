@@ -45,7 +45,42 @@
     border:2px solid #1B9AAA;
     border-radius: 25px ;
     display: flex;
-    align-items: start;
+    align-items: center;
     flex-direction: column; 
 }
 
+.searchbar{
+    height: 9vh;
+    width: 95%;
+    background-color: transparent;
+    margin: 1em;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom:4vh;
+}
+
+.searchbar input{
+    height: 100%;
+    width: 100%;
+    border:2px solid #1B9AAA;
+    border-radius: 15px;
+    background: #222;
+    outline: none;
+    padding: 10px;
+    color:white;
+}
+
+.list{
+    width: 95%;
+
+}
+
+
+.user-contact{
+    height: 10vh;
+    width:100% ;
+    border:2px solid grey;
+    border-radius: 15px;
+    
+}

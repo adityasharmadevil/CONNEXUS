@@ -2,12 +2,12 @@
     background: #000;
 }
 
-.header{
+.header1{
     height: 60vh;
     width: 100%;
     display: flex;
-    align-items: center;
     justify-content: center;
+    align-items: end;
 }
 
 /* .header h1:hover .header{
