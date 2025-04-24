@@ -1,0 +1,35 @@
+.Security-Section{
+    height: 100vh;
+    width: 100%;
+    background-color: black;
+}
+
+.heading{
+    height: 40vh;
+    /* background-color: aqua; */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.heading h1{
+    color: white;
+}
+
+.info-section{
+    height: 50vh;
+    width: 100%;
+    /* background:white ; */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* flex-wrap: no; */
+}
+
+.box{
+    height: 100%;
+    width: 40vw;
+    margin: 2vw;
+    border: 2px solid rgb(128, 126, 126);
+    border-radius: 15px;
+}

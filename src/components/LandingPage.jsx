@@ -8,7 +8,7 @@ function LandingPage() {
             <h1 className='text-[#F8F9FA] text-[5vw]'>Talk <i className='text-[#1B9AAA]'>Securely</i> !</h1>
         </div>
         <div className='w-full py-2 flex justify-center'>
-          <button className='h-[6vh] w-[15vw] rounded-lg bg-[#1B9AAA] font-[Poppins]'>Make a Call </button>
+          <button className='h-[6vh] w-[15vw] rounded-lg bg-[#1B9AAA] font-[Poppins] hover:shadow-lg shadow-[#1B9AAA] hover:text-white'>Make a Call </button>
         </div>
     </div>
   )

@@ -1,0 +1,15 @@
+.about{
+    background: #000;
+}
+
+.header{
+    height: 60vh;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* .header h1:hover .header{
+    border-left: 2px solid #1B9AAA;
+} */

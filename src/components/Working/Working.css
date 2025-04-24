@@ -1,0 +1,14 @@
+.working{
+    background: #000;
+}
+
+.heading{
+    height: 40vh;
+    width: 100%;
+}
+
+.list-section{
+    height: 60vh;
+    width: 100%;
+    color: white;
+}

@@ -1,0 +1,51 @@
+.contact{
+    background: #000;
+    height: 100vh;
+    width: 100%;
+    font-family: 'Poppins';
+    /* display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column; */
+}
+
+.header{
+    height: 15vh;
+    /* background: #b69a9a;  */
+    display: flex;
+    justify-content: start;
+
+}
+
+#logo{
+    color: white;
+    font-family: "Playwrite IN", serif;
+    font-size: 2rem;
+    padding-left: 5vw;
+    font-weight: bold;
+}
+
+.contact h1{
+    color :white;
+    font-size: 2rem;
+}
+
+.contacts{
+    /* background-color: blanchedalmond; */
+    display: flex;
+    align-items: start;
+    justify-content: center;
+}
+
+.contact-list{
+    height: 70vh;
+    width: 60%;
+    margin: 2vw;
+    padding: 1rem;
+    border:2px solid #1B9AAA;
+    border-radius: 25px ;
+    display: flex;
+    align-items: start;
+    flex-direction: column; 
+}
+
