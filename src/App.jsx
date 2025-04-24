@@ -29,18 +29,23 @@ function App() {
                 <About />
                 <SecuritySection />
                 <Working />
-                {/* <Contact /> */}
                 <Footer />
               </>
             }
           />
+
+          <Route path="/contacts" element={<Contact />} />        
         </Routes>
+
+       
 
         {/* Modals */}
         {showLogin && <Loginpage onClose={() => setShowLogin(false)} onSignupClick={() => { setShowLogin(false); setShowSignup(true); }} />}
         {showSignup && <Signup onClose={() => setShowSignup(false)} />}
       </div>
     </Router>
+
+   
   );
 }
 
