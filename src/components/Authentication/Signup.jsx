@@ -1,7 +1,48 @@
-import React from "react";
-import { X } from "lucide-react"; // You can replace this with plain '×' if preferred
+import React, { useState } from "react";
+import { X } from "lucide-react";
+import axios from "axios";
 
 const Signup = ({ onClose }) => {
+  const [formData, setFormData] = useState({
+    fullName: '',
+    email: '',
+    username: '',
+    password: '',
+    confirmPassword: '',
+  });
+
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (formData.password !== formData.confirmPassword) {
+      alert('Passwords do not match!');
+      return;
+    }
+
+    try {
+      const response = await axios.post('http://localhost:8080/api/users/register', {
+        fullName: formData.fullName,
+        email: formData.email,
+        username: formData.username,
+        password: formData.password,
+      });
+
+      console.log('Signup Success:', response.data);
+      alert('Signup successful!');
+      onClose();
+    } catch (error) {
+      console.error('Signup Error:', error);
+      alert('Signup failed! Please try again.');
+    }
+  };
+
   return (
     <div className="fixed inset-0 z-20 bg-black bg-opacity-60 flex items-center justify-center">
       <div className="relative bg-zinc-800 shadow-xl rounded-lg w-full max-w-md p-8">
@@ -18,30 +59,45 @@ const Signup = ({ onClose }) => {
         <h2 className="text-xl font-semibold text-white mb-6">Create your account</h2>
 
         {/* Form */}
-        <form className="space-y-4">
+        <form className="space-y-4" onSubmit={handleSubmit}>
           <input
             type="text"
+            name="fullName"
             placeholder="Full Name"
+            value={formData.fullName}
+            onChange={handleChange}
             className="w-full px-4 py-2 text-white bg-zinc-700 border-none rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500"
           />
           <input
             type="email"
+            name="email"
             placeholder="Email"
+            value={formData.email}
+            onChange={handleChange}
             className="w-full px-4 py-2 text-white bg-zinc-700 border-none rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500"
           />
           <input
             type="text"
+            name="username"
             placeholder="Username"
+            value={formData.username}
+            onChange={handleChange}
             className="w-full px-4 py-2 text-white bg-zinc-700 border-none rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500"
           />
           <input
             type="password"
+            name="password"
             placeholder="Password"
+            value={formData.password}
+            onChange={handleChange}
             className="w-full px-4 py-2 text-white bg-zinc-700 border-none rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500"
           />
           <input
             type="password"
+            name="confirmPassword"
             placeholder="Confirm Password"
+            value={formData.confirmPassword}
+            onChange={handleChange}
             className="w-full px-4 py-2 text-white bg-zinc-700 border-none rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500"
           />
 
@@ -56,7 +112,7 @@ const Signup = ({ onClose }) => {
         {/* Login Link */}
         <p className="text-center text-sm text-gray-600 mt-4">
           Already have an account?{" "}
-          <a href="#" onClick={onClose} className="text-cyan-600 hover:underline">
+          <a href="./Authentication/Loginpage" onClick={onClose} className="text-cyan-600 hover:underline">
             Log in
           </a>
         </p>
