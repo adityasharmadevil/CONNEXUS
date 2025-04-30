@@ -2,41 +2,69 @@ import React, { useState } from "react";
 import { X } from "lucide-react";
 import axios from "axios";
 
-const SuccessPopup = ({ onLogin }) => {
-  return (
-    <div className="fixed inset-0 z-30 bg-black bg-opacity-60 flex items-center justify-center">
-      <div className="bg-white rounded-lg p-6 shadow-lg max-w-sm w-full text-center">
-        <h2 className="text-lg font-semibold text-green-600 mb-2">Registration Successful!</h2>
-        <p className="text-gray-700 mb-4">Please log in to start calling.</p>
-        <button
-          onClick={onLogin}
-          className="bg-[#1B9AAA] text-white px-4 py-2 rounded hover:bg-[#178e8d]"
-        >
-          Login
-        </button>
-      </div>
+const SuccessPopup = ({ onLogin }) => (
+  <div className="fixed inset-0 z-30 bg-black bg-opacity-60 flex items-center justify-center">
+    <div className="bg-white rounded-lg p-6 shadow-lg max-w-sm w-full text-center">
+      <h2 className="text-lg font-semibold text-green-600 mb-2">Registration Successful!</h2>
+      <p className="text-gray-700 mb-4">Please log in to start calling.</p>
+      <button
+        onClick={onLogin}
+        className="bg-[#1B9AAA] text-white px-4 py-2 rounded hover:bg-[#178e8d]"
+      >
+        Login
+      </button>
     </div>
-  );
+  </div>
+);
+
+
+const generateUsername = () => {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';         //username (10 digit alphanumeric value)
+  let username = '';
+  for (let i = 0; i < 6; i++) {
+    username += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  const digits = Math.floor(1000 + Math.random() * 9000); 
+  return username + digits;
 };
 
-
 const Signup = ({ onClose, onLoginClick }) => {
-
-  const [showSuccess, setShowSuccess] = useState(false);
-
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
-    username: '',
     password: '',
     confirmPassword: '',
   });
+
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
     });
+  };
+
+  // Ensure unique username by checking with backend
+  const getUniqueUsername = async () => {
+    let unique = false;
+    let newUsername = '';
+
+    while (!unique) {
+      newUsername = generateUsername();
+      try {
+        const res = await axios.get(`http://localhost:8080/api/users/check-username/${newUsername}`);
+        if (res.data.available) {
+          unique = true;
+        }
+      } catch (err) {
+        console.error("Username check failed", err);
+        break; // fallback to stop loop on error
+      }
+    }
+
+    return newUsername;
   };
 
   const handleSubmit = async (e) => {
@@ -47,22 +75,24 @@ const Signup = ({ onClose, onLoginClick }) => {
       return;
     }
 
+    setLoading(true);
+
     try {
+      const username = await getUniqueUsername();
       const response = await axios.post('http://localhost:8080/api/users/register', {
         fullName: formData.fullName,
         email: formData.email,
-        username: formData.username,
+        username,
         password: formData.password,
       });
 
       console.log('Signup Success:', response.data);
-      // alert('Signup successful!, please login again');
-      setShowSuccess(true); 
-      onClose();
-      onLoginClick();
+      setShowSuccess(true);
     } catch (error) {
       console.error('Signup Error:', error);
       alert('Signup failed! Please try again.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -78,7 +108,6 @@ const Signup = ({ onClose, onLoginClick }) => {
           </button>
         </div>
 
-        {/* Title */}
         <h2 className="text-xl font-semibold text-white mb-6">Create your account</h2>
 
         {/* Form */}
@@ -89,7 +118,8 @@ const Signup = ({ onClose, onLoginClick }) => {
             placeholder="Full Name"
             value={formData.fullName}
             onChange={handleChange}
-            className="w-full px-4 py-2 text-white bg-zinc-700 border-none rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500"
+            required
+            className="w-full px-4 py-2 text-white bg-zinc-700 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500"
           />
           <input
             type="email"
@@ -97,23 +127,17 @@ const Signup = ({ onClose, onLoginClick }) => {
             placeholder="Email"
             value={formData.email}
             onChange={handleChange}
-            className="w-full px-4 py-2 text-white bg-zinc-700 border-none rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500"
+            required
+            className="w-full px-4 py-2 text-white bg-zinc-700 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500"
           />
-          {/* <input
-            type="text"
-            name="username"
-            placeholder="Username"
-            value={formData.username}
-            onChange={handleChange}
-            className="w-full px-4 py-2 text-white bg-zinc-700 border-none rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500"
-          /> */}
           <input
             type="password"
             name="password"
             placeholder="Password"
             value={formData.password}
             onChange={handleChange}
-            className="w-full px-4 py-2 text-white bg-zinc-700 border-none rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500"
+            required
+            className="w-full px-4 py-2 text-white bg-zinc-700 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500"
           />
           <input
             type="password"
@@ -121,41 +145,48 @@ const Signup = ({ onClose, onLoginClick }) => {
             placeholder="Confirm Password"
             value={formData.confirmPassword}
             onChange={handleChange}
-            className="w-full px-4 py-2 text-white bg-zinc-700 border-none rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500"
+            required
+            className="w-full px-4 py-2 text-white bg-zinc-700 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500"
           />
 
           <button
             type="submit"
-            className="w-full bg-cyan-600 text-white py-2 rounded-md hover:bg-cyan-700 transition"
+            className="w-full flex items-center justify-center bg-[#1B9AAA] text-white py-2 rounded-md hover:bg-cyan-700 hover:shadow-lg shadow-cyan-700 transition"
+            disabled={loading}
           >
-            Sign Up
+            {loading ? (
+              <svg className="animate-spin h-5 w-5 mr-2 text-white" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
+              </svg>
+            ) : null}
+            {loading ? 'Signing Up...' : 'Sign Up'}
           </button>
         </form>
 
-        {/* Login Link */}
         <p className="text-center text-sm text-gray-600 mt-4">
           Already have an account?{" "}
           <button
-             onClick={() => {
-                onClose();       
-                onLoginClick();  
-              }}
-              className="text-cyan-600 hover:underline">
-              Log in
+            onClick={() => {
+              onClose();
+              onLoginClick();
+            }}
+            className="text-cyan-600 hover:underline"
+          >
+            Log in
           </button>
         </p>
       </div>
 
       {showSuccess && (
-  <SuccessPopup
-    onLogin={() => {
-      setShowSuccess(false);  
-      onClose();              
-      onLoginClick();         
-    }}
-  />
-)}
-
+        <SuccessPopup
+          onLogin={() => {
+            setShowSuccess(false);
+            onClose();
+            onLoginClick();
+          }}
+        />
+      )}
     </div>
   );
 };

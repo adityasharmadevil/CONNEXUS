@@ -68,7 +68,7 @@ function Loginpage({ onClose, onSignupClick }) {
 
           <button
             type="submit"
-            className='mt-2 w-full py-3 bg-[#1B9AAA] text-white rounded-md hover:bg-[#178e8d]'
+            className='mt-2 w-full py-3 bg-[#1B9AAA] text-white rounded-md hover:bg-cyan-700 hover:shadow-lg shadow-cyan-700'
           >
             Login
           </button>
