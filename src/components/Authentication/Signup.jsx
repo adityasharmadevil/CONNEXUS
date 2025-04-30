@@ -1,47 +1,45 @@
 import React, { useState } from "react";
 import { X } from "lucide-react";
+import axios from "axios";
 
 const Signup = ({ onClose }) => {
-  const [fullName, setFullName] = useState('');
-  const [email, setEmail] = useState('');
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [error, setError] = useState('');
+  const [formData, setFormData] = useState({
+    fullName: '',
+    email: '',
+    username: '',
+    password: '',
+    confirmPassword: '',
+  });
 
-  const handleSignup = async (e) => {
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (password !== confirmPassword) {
-      setError('Passwords do not match.');
+    if (formData.password !== formData.confirmPassword) {
+      alert('Passwords do not match!');
       return;
     }
 
     try {
-      const response = await fetch('http://localhost:8080/api/signup', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          fullName,
-          email,
-          username,
-          password,
-        }),
+      const response = await axios.post('http://localhost:8080/api/users/register', {
+        fullName: formData.fullName,
+        email: formData.email,
+        username: formData.username,
+        password: formData.password,
       });
 
-      if (response.ok) {
-        const data = await response.json();
-        console.log('Signup Successful:', data);
-        onClose(); // Close the signup modal on success
-      } else {
-        const errMsg = await response.text();
-        setError(errMsg || 'Signup failed');
-      }
+      console.log('Signup Success:', response.data);
+      alert('Signup successful!');
+      onClose();
     } catch (error) {
-      console.error('Error during signup:', error);
-      setError('Something went wrong. Please try again.');
+      console.error('Signup Error:', error);
+      alert('Signup failed! Please try again.');
     }
   };
 
@@ -61,47 +59,48 @@ const Signup = ({ onClose }) => {
         <h2 className="text-xl font-semibold text-white mb-6">Create your account</h2>
 
         {/* Form */}
-        <form onSubmit={handleSignup} className="space-y-4">
+        <form className="space-y-4" onSubmit={handleSubmit}>
           <input
             type="text"
+            name="fullName"
             placeholder="Full Name"
-            value={fullName}
-            onChange={(e) => setFullName(e.target.value)}
-            className="w-full px-4 py-2 text-white bg-zinc-700 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500"
+            value={formData.fullName}
+            onChange={handleChange}
+            className="w-full px-4 py-2 text-white bg-zinc-700 border-none rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500"
           />
           <input
             type="email"
+            name="email"
             placeholder="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="w-full px-4 py-2 text-white bg-zinc-700 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500"
+            value={formData.email}
+            onChange={handleChange}
+            className="w-full px-4 py-2 text-white bg-zinc-700 border-none rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500"
           />
           <input
             type="text"
+            name="username"
             placeholder="Username"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            className="w-full px-4 py-2 text-white bg-zinc-700 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500"
+            value={formData.username}
+            onChange={handleChange}
+            className="w-full px-4 py-2 text-white bg-zinc-700 border-none rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500"
           />
           <input
             type="password"
+            name="password"
             placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="w-full px-4 py-2 text-white bg-zinc-700 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500"
+            value={formData.password}
+            onChange={handleChange}
+            className="w-full px-4 py-2 text-white bg-zinc-700 border-none rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500"
           />
           <input
             type="password"
+            name="confirmPassword"
             placeholder="Confirm Password"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            className="w-full px-4 py-2 text-white bg-zinc-700 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500"
+            value={formData.confirmPassword}
+            onChange={handleChange}
+            className="w-full px-4 py-2 text-white bg-zinc-700 border-none rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500"
           />
 
-          {/* Error Message */}
-          {error && <div className="text-red-500 text-sm text-center">{error}</div>}
-
-          {/* Signup Button */}
           <button
             type="submit"
             className="w-full bg-cyan-600 text-white py-2 rounded-md hover:bg-cyan-700 transition"
@@ -113,7 +112,7 @@ const Signup = ({ onClose }) => {
         {/* Login Link */}
         <p className="text-center text-sm text-gray-600 mt-4">
           Already have an account?{" "}
-          <a href="#" onClick={onClose} className="text-cyan-600 hover:underline">
+          <a href="./Authentication/Loginpage" onClick={onClose} className="text-cyan-600 hover:underline">
             Log in
           </a>
         </p>

@@ -48,20 +48,19 @@ const dummyContacts = [
 
 const ContactList = () => {
   const [search, setSearch] = useState("");
-  const [showCall, setShowCall] = useState(false);
-  const [callType, setCallType] = useState(null); // 'audio' or 'video'
 
   const filteredContacts = dummyContacts.filter(contact =>
     contact.name.toLowerCase().includes(search.toLowerCase())
   );
 
-  const handleCall = (type) => {
-    setCallType(type);
-    setShowCall(true);
-  };
-
   return (
     <div className="min-h-screen w-full bg-black flex justify-between items-center">
+      {/* Header */}
+      {/* <header className="w-full px-6 py-4 bg-white shadow flex justify-between items-center">
+        <h1 className="text-2xl font-bold text-cyan-700">Connexus</h1>
+        <Link to="/" className="text-cyan-600 font-medium hover:underline">Home</Link>
+      </header> */}
+
       {/* Main container */}
       <div className="w-full max-w-md mx-auto p-4 mt-6 bg-white shadow-md rounded-lg">
         {/* Search Bar */}
@@ -82,16 +81,10 @@ const ContactList = () => {
             >
               <span className="font-medium text-gray-800">{contact.name}</span>
               <div className="flex items-center gap-2">
-                <button
-                  className="text-cyan-600 hover:text-cyan-800"
-                  onClick={() => handleCall("audio")}
-                >
+                <button className="text-cyan-600 hover:text-cyan-800">
                   <Phone size={20} />
                 </button>
-                <button
-                  className="text-cyan-600 hover:text-cyan-800"
-                  onClick={() => handleCall("video")}
-                >
+                <button className="text-cyan-600 hover:text-cyan-800">
                   <Video size={20} />
                 </button>
                 <button className="text-gray-600 hover:text-gray-800">
@@ -106,11 +99,6 @@ const ContactList = () => {
           )}
         </div>
       </div>
-
-      {/* Call Popup */}
-      {showCall && (
-        <CallWindow type={callType} onClose={() => setShowCall(false)} />
-      )}
     </div>
   );
 };
