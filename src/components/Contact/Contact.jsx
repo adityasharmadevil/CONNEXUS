@@ -35,7 +35,7 @@
 import React, { useState } from "react";
 import { Phone, Video, MoreVertical } from "lucide-react";
 import { Link } from "react-router-dom";
-import CallWindow from "../CallWindow/Callwindow"; 
+import CallWindow from "../Callwindow/Callwindow"; 
 
 const dummyContacts = [
   { id: 1, name: "Name1" },

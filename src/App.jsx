@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-
-
 import Header from './components/Header/Header';
 import LandingPage from './components/LandingPage';
 import About from './components/About/About';
@@ -11,15 +9,14 @@ import Footer from './components/Footer/Footer';
 import Contact from './components/Contact/Contact';
 import Loginpage from './components/Authentication/Loginpage';
 import Signup from './components/Authentication/Signup';
+import Callwindow from './components/Callwindow/Callwindow';
 
 function App() {
   const [showLogin, setShowLogin] = useState(false);
   const [showSignup, setShowSignup] = useState(false);
 
-  // 🔵 New state to hold backend message
   const [message, setMessage] = useState('');
 
-  // 🔵 New effect to fetch message from backend
   useEffect(() => {
     fetch('http://localhost:8080/api/hello')
       .then(response => response.text())
@@ -32,7 +29,6 @@ function App() {
       <div className='w-full min-h-screen bg-[#111] relative overflow-x-hidden'>
         <Header onLoginClick={() => setShowLogin(true)} onSignupClick={() => setShowSignup(true)} />
 
-        {/* 🔵 Optional: Display backend message at top */}
         {message && (
           <div className="text-center text-sm text-white bg-cyan-600 py-2">
             {message}
@@ -70,6 +66,13 @@ function App() {
       </div>
     </Router>
   );
+
+  // return(
+  //   <div>
+  //   <Callwindow/>
+  // </div>
+  // )
+
 }
 
 export default App;
