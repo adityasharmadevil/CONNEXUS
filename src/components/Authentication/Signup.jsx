@@ -2,7 +2,28 @@ import React, { useState } from "react";
 import { X } from "lucide-react";
 import axios from "axios";
 
-const Signup = ({ onClose }) => {
+const SuccessPopup = ({ onLogin }) => {
+  return (
+    <div className="fixed inset-0 z-30 bg-black bg-opacity-60 flex items-center justify-center">
+      <div className="bg-white rounded-lg p-6 shadow-lg max-w-sm w-full text-center">
+        <h2 className="text-lg font-semibold text-green-600 mb-2">Registration Successful!</h2>
+        <p className="text-gray-700 mb-4">Please log in to start calling.</p>
+        <button
+          onClick={onLogin}
+          className="bg-[#1B9AAA] text-white px-4 py-2 rounded hover:bg-[#178e8d]"
+        >
+          Login
+        </button>
+      </div>
+    </div>
+  );
+};
+
+
+const Signup = ({ onClose, onLoginClick }) => {
+
+  const [showSuccess, setShowSuccess] = useState(false);
+
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
@@ -35,8 +56,10 @@ const Signup = ({ onClose }) => {
       });
 
       console.log('Signup Success:', response.data);
-      alert('Signup successful!');
+      // alert('Signup successful!, please login again');
+      setShowSuccess(true); 
       onClose();
+      onLoginClick();
     } catch (error) {
       console.error('Signup Error:', error);
       alert('Signup failed! Please try again.');
@@ -76,14 +99,14 @@ const Signup = ({ onClose }) => {
             onChange={handleChange}
             className="w-full px-4 py-2 text-white bg-zinc-700 border-none rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500"
           />
-          <input
+          {/* <input
             type="text"
             name="username"
             placeholder="Username"
             value={formData.username}
             onChange={handleChange}
             className="w-full px-4 py-2 text-white bg-zinc-700 border-none rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500"
-          />
+          /> */}
           <input
             type="password"
             name="password"
@@ -112,11 +135,27 @@ const Signup = ({ onClose }) => {
         {/* Login Link */}
         <p className="text-center text-sm text-gray-600 mt-4">
           Already have an account?{" "}
-          <a href="./Authentication/Loginpage" onClick={onClose} className="text-cyan-600 hover:underline">
-            Log in
-          </a>
+          <button
+             onClick={() => {
+                onClose();       
+                onLoginClick();  
+              }}
+              className="text-cyan-600 hover:underline">
+              Log in
+          </button>
         </p>
       </div>
+
+      {showSuccess && (
+  <SuccessPopup
+    onLogin={() => {
+      setShowSuccess(false);  
+      onClose();              
+      onLoginClick();         
+    }}
+  />
+)}
+
     </div>
   );
 };

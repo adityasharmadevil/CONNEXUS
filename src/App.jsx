@@ -10,12 +10,14 @@ import Footer from './components/Footer/Footer';
 import Contact from './components/Contact/Contact';
 import Loginpage from './components/Authentication/Loginpage';
 import Signup from './components/Authentication/Signup';
-import Callwindow from './components/Callwindow/Callwindow';
+// import Callwindow from './components/Callwindow/Callwindow';
 
 function App() {
   const [showLogin, setShowLogin] = useState(false);
   const [showSignup, setShowSignup] = useState(false);
   const [backendMessage, setBackendMessage] = useState('');
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
 
   useEffect(() => {
     // Fetch message from Spring Boot backend
@@ -28,7 +30,12 @@ function App() {
   return (
     <Router>
       <div className='w-full min-h-screen bg-[#111] relative overflow-x-hidden'>
-        <Header onLoginClick={() => setShowLogin(true)} onSignupClick={() => setShowSignup(true)} />
+        <Header 
+            onLoginClick={() => setShowLogin(true)} 
+            onSignupClick={() => setShowSignup(true)} 
+            isLoggedIn={isLoggedIn}
+            onLogout={() => setIsLoggedIn(false)} 
+            />
 
         {/* Show backend message */}
         {backendMessage && (
@@ -50,7 +57,7 @@ function App() {
               </>
             }
           />
-
+          
           <Route path="/contacts" element={<Contact />} />        
         </Routes>
 
@@ -62,19 +69,13 @@ function App() {
               setShowLogin(false);
               setShowSignup(true);
             }}
+            onLoginSuccess={() => setIsLoggedIn(true)}
           />
         )}
-        {showSignup && <Signup onClose={() => setShowSignup(false)} />}
+        {showSignup && <Signup onClose={() => setShowSignup(false)} onLoginClick={() => setShowLogin(true)} />}
       </div>
     </Router>
   );
-
-  // return(
-  //   <div>
-  //   <Callwindow/>
-  // </div>
-  // )
-
 }
 
 export default App;
