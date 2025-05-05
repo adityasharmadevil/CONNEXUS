@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 
 import Header from './components/Header/Header';
 import LandingPage from './components/LandingPage';
@@ -15,6 +15,7 @@ import CallWindow from './components/Callwindow/Callwindow';
 // Wrapper to use useNavigate in functional App component
 const AppWrapper = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [showLogin, setShowLogin] = useState(false);
   const [showSignup, setShowSignup] = useState(false);
   const [backendMessage, setBackendMessage] = useState('');
@@ -36,18 +37,21 @@ const AppWrapper = () => {
 
   return (
     <div className='w-full min-h-screen bg-[#111] relative overflow-x-hidden'>
-      <Header 
-        onLoginClick={() => setShowLogin(true)} 
-        onSignupClick={() => setShowSignup(true)} 
+    {location.pathname !== '/contacts' && (
+      <Header
+        onLoginClick={() => setShowLogin(true)}
+        onSignupClick={() => setShowSignup(true)}
         isLoggedIn={isLoggedIn}
-        onLogout={() => setIsLoggedIn(false)} 
+        onLogout={() => setIsLoggedIn(false)}
       />
+    )}
+    
 
-      {backendMessage && (
+      {/* {backendMessage && (
         <div className="text-center text-white bg-green-600 p-2">
           {backendMessage}
         </div>
-      )}
+      )} */}
 
       <Routes>
         <Route

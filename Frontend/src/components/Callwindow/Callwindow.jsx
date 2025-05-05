@@ -20,7 +20,7 @@ const CallWindow = () => {
 
   const toggleVideo = () => setVideoEnabled(!videoEnabled);
   const toggleMic = () => setMicEnabled(!micEnabled);
-  const handleEndCall = () => navigate('/');
+  const handleEndCall = () => navigate('/contacts');
 
   return (
     <div className="main fixed inset-0 bg-black bg-opacity-80 z-50 flex flex-col">
