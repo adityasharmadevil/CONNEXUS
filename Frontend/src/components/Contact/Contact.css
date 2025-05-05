@@ -5,10 +5,10 @@
     background-position: center;
     color: white;
 }
-
+/* 
 .navbar{
     background-color: rgb(123, 128, 128);
-}
+} */
 
 .navbar h1{
     color: white; 
@@ -30,23 +30,31 @@
     display: flex;
     height: 85vh;
     width: 100vw;
-    
+    padding: 1rem 2rem;
+
 }
 
-.left, .right{
-    height: 100%;
+.right{
+    height: 90%;
+    width: 50%;
+    /* border: 2px solid white; */
+}
+
+.left{
+    height: 90%;
     width: 50%;
     border: 2px solid white;
+    border-radius: 10px;
 }
 
 .searchbar{
     height: 8vh;
     width: 90%;
-    border: 2px solid white;
+    border: 2px solid #1B9AAA;
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius:5px ;
+    border-radius:10px ;
     
 } 
 
@@ -56,13 +64,14 @@
     padding-left: 1rem;
     border: none;
     outline: none;
-    border-radius:5px;
+    border-radius:10px;
 }
 
 .searchbar button{
     background-color: #1B9AAA;
     height: 7.9vh;
     width: 20%;
+    border-radius: 10px;
 }
 
 .nametab{

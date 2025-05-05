@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import './Contact.css';
 import { useNavigate } from 'react-router-dom'; 
 
+
 function Contact() {
 
   const navigate = useNavigate();
@@ -62,7 +63,9 @@ function Contact() {
           
         </div>
 
-        <div className="right"></div>
+        <div className="right">
+          <img src="" alt="" />
+        </div>
 
       </div>
     </div>
