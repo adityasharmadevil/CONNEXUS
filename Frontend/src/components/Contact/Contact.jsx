@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import './Contact.css';
-import { useNavigate } from 'react-router-dom'; 
-
+import { useNavigate, Link } from 'react-router-dom'; 
+ 
 
 function Contact() {
 
   const navigate = useNavigate();
+  const [showProfileMenu, setShowProfileMenu] = useState(false);
 
   const mockUsers = [
     { username: 'JOHN1234', fullName: 'John Doe', email: 'john@example.com' },
@@ -41,13 +42,18 @@ function Contact() {
     <div className='mainpage'>
       <div className="navbar w-full py-[2vw] px-[3vw]">
         <h1 className="logo font-['Playwrite_IN'] font-semibold text-[2vw]">Connexus</h1>
-        <button className={`transition text-xl ${scrolled ? "hover:underline underline-offset-2" : "hover:text-[#1B9AAA]"}`}>Profile</button>
+        <div
+            className="relative font-[Poppins]"  
+            onMouseEnter={() => setShowProfileMenu(true)}
+            onMouseLeave={() => setShowProfileMenu(false)}
+        >
+            <button className={"transition text-xl "}>Profile</button>
             {showProfileMenu && (
               <div className="absolute top-5 right-0 mt-2 w-40 bg-white text-black rounded shadow-lg py-2 z-50">
-                <Link to="/profile" className="block px-4 py-2 hover:bg-gray-100">My Profile</Link>
-                <Link to="/settings" className="block px-4 py-2 hover:bg-gray-100">Settings</Link>
+                <Link to="/profile" className="block px-4 py-2 hover:bg-gray-100 hover:text-[#1B9AAA]">My Profile</Link>
+                <Link to="/settings" className="block px-4 py-2 hover:bg-gray-100 hover:text-[#1B9AAA]">Settings</Link>
                 <button 
-                  className="block px-4 py-2 hover:bg-gray-100 w-full text-left"
+                  className="block px-4 py-2 hover:bg-gray-100 w-full text-left hover:text-red-600"
                   onClick={() => {
                     onLogout();         
                     setShowProfileMenu(false);  
@@ -56,8 +62,8 @@ function Contact() {
                   >Logout</button>
               </div>
             )}
-          </div>
-    
+        </div>
+      </div>
 
       <div className="Call-display flex items-center">
         <div className="left flex flex-col items-center">

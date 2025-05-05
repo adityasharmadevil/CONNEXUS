@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { X } from "lucide-react";
 import axios from "axios";
 
+
 const SuccessPopup = ({ onLogin, username }) => (
   <div className="fixed inset-0 z-30 bg-black bg-opacity-60 flex items-center justify-center">
     <div className="bg-white rounded-lg p-6 shadow-lg max-w-sm w-full text-center">
@@ -80,20 +81,22 @@ const Signup = ({ onClose, onLoginClick }) => {
   const getUniqueUsername = async () => {
     let unique = false;
     let newUsername = '';
-
+ 
     while (!unique) {
       newUsername = generateUsername();
       try {
         const res = await axios.get(`http://localhost:8080/api/users/check-username/${newUsername}`);
-        if (!res) {
+ 
+        // Assuming your backend returns { available: true } if it's unique
+        if (res.data.available) {
           unique = true;
         }
       } catch (err) {
-        console.error("Username check failed", err);
+        console.error("Username check failed:", err.message);
         break;
       }
     }
-
+ 
     return newUsername;
   };
 

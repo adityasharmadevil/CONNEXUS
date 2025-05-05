@@ -23,14 +23,18 @@ function Loginpage({ onClose, onSignupClick, onLoginSuccess  }) {
     const hashArray = Array.from(new Uint8Array(hashBuffer));
     const hashHex = hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
     setHash(hashHex);
+    console.log(hash);
   }
-
+    // let passwd=encryptSHA256(formData.password);
+    // console.log(passwd);
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       const response = await axios.post('http://localhost:8080/api/users/login', {
         username: formData.usernameOrEmail,
-        password: encryptSHA256(formData.password),
+        // password: encryptSHA256(formData.password),
+        password: formData.password
+        // password:passwd,
       });
   
       console.log('Login Success:', response.data);
@@ -58,15 +62,15 @@ function Loginpage({ onClose, onSignupClick, onLoginSuccess  }) {
         {/* Form */}
         <form onSubmit={handleSubmit} className="w-full flex flex-col gap-4">
           <input
-            className='w-full p-3 text-white bg-zinc-700 rounded-md'
+            className='w-full p-3 text-white bg-zinc-700 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500'
             type="text"
             name="usernameOrEmail"
-            placeholder='Username or Email'
+            placeholder='Username'
             value={formData.usernameOrEmail}
             onChange={handleChange}
           />
           <input
-            className='w-full p-3 text-white bg-zinc-700 rounded-md'
+            className='w-full p-3 text-white bg-zinc-700 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500'
             type="password"
             name="password"
             placeholder='Password'

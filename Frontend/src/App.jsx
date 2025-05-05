@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react'; 
+import axios from "axios";
 import { BrowserRouter as Router, Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 
 import Header from './components/Header/Header';
@@ -21,13 +22,17 @@ const AppWrapper = () => {
   const [backendMessage, setBackendMessage] = useState('');
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
+  const api = axios.create({
+    baseURL: 'http://localhost:8080'
+    // withCredentials: true,
+  });
+
   useEffect(() => {
-    fetch('http://localhost:8080/api/hello')
-      // .then(response => response.text())
-      .then(alert("backend active"))
-      // .then(data => setBackendMessage(data))
-      .catch(error => console.error('Error fetching backend message:', error));
+    api.get('/api/hello')
+      .then(res => console.log(res.data))
+      .catch(err => console.error(err));
   }, []);
+
 
   const handleLoginSuccess = () => {
     setIsLoggedIn(true);
@@ -75,7 +80,7 @@ const AppWrapper = () => {
       {/* Modals */}
       {showLogin && (
         <Loginpage
-          onClose={() => setShowLogin(true)}
+          onClose={() => setShowLogin(false)}
           onSignupClick={() => {
             setShowLogin(false);
             setShowSignup(true);

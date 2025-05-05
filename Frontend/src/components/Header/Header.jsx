@@ -51,7 +51,7 @@ function Header({ onLoginClick, onSignupClick, isLoggedIn, onLogout }) {
               Working
           </Link>
           <div
-            className="relative"
+            className="relative"  
             onMouseEnter={() => setShowProfileMenu(true)}
             onMouseLeave={() => setShowProfileMenu(false)}
           >
