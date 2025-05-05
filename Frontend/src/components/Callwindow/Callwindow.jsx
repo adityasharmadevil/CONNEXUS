@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import './Callwindow.css';
 import { Video, VideoOff, Mic, MicOff, PhoneOff } from "lucide-react";
@@ -10,64 +10,146 @@ const CallWindow = () => {
 
   const [videoEnabled, setVideoEnabled] = useState(type === "video");
   const [micEnabled, setMicEnabled] = useState(true);
+  const [sessionId, setSessionId] = useState(null);
+  const [callStartTime, setCallStartTime] = useState(null);
+
+  const peerConnection = useRef(null);
+  const localVideoRef = useRef(null);
+  const remoteVideoRef = useRef(null);
+  const signalingServer = useRef(null);
+
+  const YOUR_ID = "caller-unique-id"; // Replace with actual caller ID logic
 
   useEffect(() => {
-    // If no user info is passed, redirect back
     if (!user) {
       navigate('/');
+      return;
     }
-  }, [user, navigate]);
 
-  const toggleVideo = () => setVideoEnabled(!videoEnabled);
-  const toggleMic = () => setMicEnabled(!micEnabled);
-  const handleEndCall = () => navigate('/contacts');
+    checkUserStatusAndStartCall(user.uniqueId);
+  }, [user]);
+
+  const checkUserStatusAndStartCall = async (userId) => {
+    const res = await fetch(`http://localhost:8080/api/status/${userId}`);
+    const data = await res.json();
+    if (data.status === "active") {
+      initiateCallSession();
+    } else {
+      alert("User is not active. Call cannot be placed.");
+      navigate('/contacts');
+    }
+  };
+
+  const initiateCallSession = async () => {
+    const response = await fetch(`http://localhost:8080/api/calls/start`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ callerId: YOUR_ID, receiverId: user.uniqueId })
+    });
+
+    const session = await response.json();
+    setSessionId(session.sessionId);
+    setCallStartTime(new Date());
+    setupWebRTC();
+  };
+
+  const setupWebRTC = () => {
+    peerConnection.current = new RTCPeerConnection({
+      iceServers: [{ urls: "stun:stun.l.google.com:19302" }]
+    });
+
+    peerConnection.current.ontrack = (event) => {
+      remoteVideoRef.current.srcObject = event.streams[0];
+    };
+
+    navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+      .then(stream => {
+        localVideoRef.current.srcObject = stream;
+        stream.getTracks().forEach(track => peerConnection.current.addTrack(track, stream));
+      });
+
+    signalingServer.current = new WebSocket("ws://localhost:5000/ws");
+
+    signalingServer.current.onmessage = async (event) => {
+      const data = JSON.parse(event.data);
+      if (data.sdp) {
+        await peerConnection.current.setRemoteDescription(new RTCSessionDescription(data.sdp));
+        if (data.type === "offer") {
+          const answer = await peerConnection.current.createAnswer();
+          await peerConnection.current.setLocalDescription(answer);
+          signalingServer.current.send(JSON.stringify({ type: "answer", sdp: answer }));
+        }
+      } else if (data.candidate) {
+        await peerConnection.current.addIceCandidate(new RTCIceCandidate(data.candidate));
+      }
+    };
+
+    peerConnection.current.onicecandidate = (event) => {
+      if (event.candidate) {
+        signalingServer.current.send(JSON.stringify({ type: "candidate", candidate: event.candidate }));
+      }
+    };
+  };
+
+  const toggleVideo = () => {
+    const videoTracks = localVideoRef.current.srcObject.getVideoTracks();
+    videoTracks.forEach(track => track.enabled = !track.enabled);
+    setVideoEnabled(prev => !prev);
+  };
+
+  const toggleMic = () => {
+    const audioTracks = localVideoRef.current.srcObject.getAudioTracks();
+    audioTracks.forEach(track => track.enabled = !track.enabled);
+    setMicEnabled(prev => !prev);
+  };
+
+  const handleEndCall = async () => {
+    const endTime = new Date();
+    const duration = Math.floor((endTime - callStartTime) / 1000); // in seconds
+
+    await fetch(`http://localhost:8080/api/calls/end/${sessionId}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        endTime: endTime.toISOString(),
+        duration
+      })
+    });
+
+    if (peerConnection.current) peerConnection.current.close();
+    if (signalingServer.current) signalingServer.current.close();
+
+    alert("Call Ended");
+    navigate('/contacts');
+  };
 
   return (
     <div className="main fixed inset-0 bg-black bg-opacity-80 z-50 flex flex-col">
-      {/* Header */}
       <div className="header">
         <h1 className="text-white font-['Playwrite_IN'] font-semibold text-[2vw] py-[2vw] px-[3vw]">Connexus</h1>
       </div>
 
-      {/* Call Window */}
       <div className="callbox p-8 rounded-2xl w-[90vw] mx-auto flex flex-col items-center shadow-lg relative">
         <h2 className="text-xl font-semibold mb-2 text-white">
           {type === "audio" && !videoEnabled ? "Audio Call" : "Video Call"} with {user?.fullName}
         </h2>
         <p className="text-gray-400 mb-6">Connecting to {user?.fullName}...</p>
 
-        {/* Video Preview */}
         <div className="videopreview w-[300px] h-[200px] bg-gray-800 rounded-lg mb-6 flex items-center justify-center border border-gray-600">
-          {videoEnabled ? (
-            <p className="text-white">[Video Stream Here]</p>
-          ) : (
-            <p className="text-gray-500 italic">Camera is off</p>
-          )}
+          <video ref={localVideoRef} autoPlay playsInline muted></video>
+          <video ref={remoteVideoRef} autoPlay playsInline></video>
         </div>
 
-        {/* Controls */}
         <div className="btnbox border-2 border-white p-3 flex justify-center gap-6">
-          {/* Toggle Video */}
-          <button
-            onClick={toggleVideo}
-            className="bg-cyan-500 p-3 rounded-full hover:bg-cyan-600 transition"
-          >
+          <button onClick={toggleVideo} className="bg-cyan-500 p-3 rounded-full hover:bg-cyan-600 transition">
             {videoEnabled ? <Video size={24} className="text-white" /> : <VideoOff size={24} className="text-white" />}
           </button>
 
-          {/* Toggle Mic */}
-          <button
-            onClick={toggleMic}
-            className="bg-cyan-500 p-3 rounded-full hover:bg-cyan-600 transition"
-          >
+          <button onClick={toggleMic} className="bg-cyan-500 p-3 rounded-full hover:bg-cyan-600 transition">
             {micEnabled ? <Mic size={24} className="text-white" /> : <MicOff size={24} className="text-white" />}
           </button>
 
-          {/* End Call */}
-          <button
-            onClick={handleEndCall}
-            className="bg-red-500 p-3 rounded-full hover:bg-red-600 transition"
-          >
+          <button onClick={handleEndCall} className="bg-red-500 p-3 rounded-full hover:bg-red-600 transition">
             <PhoneOff size={24} className="text-white" />
           </button>
         </div>
