@@ -12,6 +12,7 @@ const CallWindow = () => {
   const [micEnabled, setMicEnabled] = useState(true);
   const [sessionId, setSessionId] = useState(null);
   const [callStartTime, setCallStartTime] = useState(null);
+  const [permissionsGranted, setPermissionsGranted] = useState(false);
 
   const peerConnection = useRef(null);
   const localVideoRef = useRef(null);
@@ -20,14 +21,37 @@ const CallWindow = () => {
 
   const YOUR_ID = "caller-unique-id"; // Replace with actual caller ID logic
 
+  // Request camera and mic permissions when the component mounts
   useEffect(() => {
     if (!user) {
       navigate('/');
       return;
     }
 
+    // Automatically enable video and mic when the window opens
+    setVideoEnabled(true);
+    setMicEnabled(true);
+    
     checkUserStatusAndStartCall(user.uniqueId);
+    requestMediaPermissions(); // Request camera and mic permissions
   }, [user]);
+
+  // Function to request camera and mic permissions
+  const requestMediaPermissions = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: videoEnabled, audio: micEnabled });
+      // Set the local stream to the local video element
+      if (localVideoRef.current) {
+        localVideoRef.current.srcObject = stream; // Display the local video
+        localVideoRef.current.muted = true; // Mute the local video to prevent feedback
+      }
+      setPermissionsGranted(true); // Set permission as granted once stream is received
+      stream.getTracks().forEach(track => peerConnection.current.addTrack(track, stream));
+    } catch (err) {
+      console.error("Error accessing media devices", err);
+      alert("Please grant permission to access your camera and microphone.");
+    }
+  };
 
   const checkUserStatusAndStartCall = async (userId) => {
     const res = await fetch(`http://localhost:8080/api/status/${userId}`);
@@ -61,12 +85,6 @@ const CallWindow = () => {
     peerConnection.current.ontrack = (event) => {
       remoteVideoRef.current.srcObject = event.streams[0];
     };
-
-    navigator.mediaDevices.getUserMedia({ video: true, audio: true })
-      .then(stream => {
-        localVideoRef.current.srcObject = stream;
-        stream.getTracks().forEach(track => peerConnection.current.addTrack(track, stream));
-      });
 
     signalingServer.current = new WebSocket("ws://localhost:5000/ws");
 
@@ -123,6 +141,14 @@ const CallWindow = () => {
     navigate('/contacts');
   };
 
+  if (!permissionsGranted) {
+    return (
+      <div className="main flex items-center justify-center text-white">
+        <h2>Please grant permission to access your camera and microphone.</h2>
+      </div>
+    );
+  }
+
   return (
     <div className="main fixed inset-0 bg-black bg-opacity-80 z-50 flex flex-col">
       <div className="header">
@@ -135,12 +161,19 @@ const CallWindow = () => {
         </h2>
         <p className="text-gray-400 mb-6">Connecting to {user?.fullName}...</p>
 
-        <div className="videopreview w-[300px] h-[200px] bg-gray-800 rounded-lg mb-6 flex items-center justify-center border border-gray-600">
-          <video ref={localVideoRef} autoPlay playsInline muted></video>
-          <video ref={remoteVideoRef} autoPlay playsInline></video>
+        <div className="call-container flex w-full gap-4">
+          {/* Local Video on Left */}
+          <div className="local-video w-[300px] h-[200px] bg-gray-800 rounded-lg flex items-center justify-center border border-gray-600">
+            <video ref={localVideoRef} autoPlay playsInline muted></video>
+          </div>
+
+          {/* Remote Video on Right */}
+          <div className="remote-video w-[300px] h-[200px] bg-gray-800 rounded-lg flex items-center justify-center border border-gray-600">
+            <video ref={remoteVideoRef} autoPlay playsInline></video>
+          </div>
         </div>
 
-        <div className="btnbox border-2 border-white p-3 flex justify-center gap-6">
+        <div className="btnbox border-2 border-white p-3 flex justify-center gap-6 mt-6">
           <button onClick={toggleVideo} className="bg-cyan-500 p-3 rounded-full hover:bg-cyan-600 transition">
             {videoEnabled ? <Video size={24} className="text-white" /> : <VideoOff size={24} className="text-white" />}
           </button>

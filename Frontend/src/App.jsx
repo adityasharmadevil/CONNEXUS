@@ -32,7 +32,11 @@ const AppWrapper = () => {
       .then(res => console.log(res.data))
       .catch(err => console.error(err));
   }, []);
-
+  
+  const handleLogout = () => {
+    localStorage.clear();
+    console.log("logged out");
+  }
 
   const handleLoginSuccess = () => {
     setIsLoggedIn(true);
@@ -73,7 +77,7 @@ const AppWrapper = () => {
             </>
           }
         />
-        <Route path="/contacts" element={<Contact />} />
+        <Route path="/contacts" element={<Contact onLogout={handleLogout} />} />
         <Route path="/callwindow" element={<CallWindow />} />
       </Routes>
 

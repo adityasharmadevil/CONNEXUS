@@ -1,24 +1,17 @@
 import React, { useState } from 'react';
 import './Contact.css';
-import { useNavigate, Link } from 'react-router-dom'; 
- 
+import { useNavigate, Link } from 'react-router-dom';
+import axios from 'axios';
 
-function Contact() {
-
+function Contact({ onLogout }) {
   const navigate = useNavigate();
   const [showProfileMenu, setShowProfileMenu] = useState(false);
-
-  const mockUsers = [
-    { username: 'JOHN1234', fullName: 'John Doe', email: 'john@example.com' },
-    { username: 'alice5678', fullName: 'Alice Smith', email: 'alice@example.com' },
-    { username: 'bob4321', fullName: 'Bob Johnson', email: 'bob@example.com' },
-  ];
 
   const [searchTerm, setSearchTerm] = useState('');
   const [searchedUser, setSearchedUser] = useState(null);
   const [error, setError] = useState('');
 
-  const handleSearch = () => {
+  const handleSearch = async () => {
     const trimmed = searchTerm.trim().toUpperCase();
 
     if (!trimmed) {
@@ -27,12 +20,19 @@ function Contact() {
       return;
     }
 
-    const user = mockUsers.find(user => user.username === trimmed);// replace by api
-    if (user) {
-      setSearchedUser(user);
-      setError('');
-      navigate('/callwindow', {state:{user}});
-    } else {
+    try {
+      // Call the backend API to check the user status
+      const response = await axios.get(`http://localhost:8080/api/users/status/${trimmed}`);
+
+      if (response.data.status === 'active') {
+        // If status is active, proceed to the call window
+        const user = { username: trimmed };  // Assuming user data is fetched elsewhere
+        navigate('/callwindow', { state: { user } });
+      } else {
+        setSearchedUser(null);
+        setError('The user is not active at the moment.');
+      }
+    } catch (error) {
       setSearchedUser(null);
       setError('User not found!');
     }
@@ -82,13 +82,11 @@ function Contact() {
             >Call User</button>
           </div>
           {error && <p className="text-red-500 mt-2">{error}</p>}
-          
         </div>
 
         <div className="right">
-          <img src="" alt="" />
+          {/* You can add an image or another component if needed */}
         </div>
-
       </div>
     </div>
   );
