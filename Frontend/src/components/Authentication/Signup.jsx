@@ -2,13 +2,13 @@ import React, { useState } from "react";
 import { X } from "lucide-react";
 import axios from "axios";
 
-const SuccessPopup = ({ onLogin }) => (
+const SuccessPopup = ({ onLogin, username }) => (
   <div className="fixed inset-0 z-30 bg-black bg-opacity-60 flex items-center justify-center">
     <div className="bg-white rounded-lg p-6 shadow-lg max-w-sm w-full text-center">
       <h2 className="text-lg font-semibold text-green-600 mb-2">Registration Successful!</h2>
-      <p className="text-gray-700 mb-4">Please log in to start calling.</p>
-      <p>Note down your userID before Login</p>
-      <p>userID : here userid will be shown</p>
+      <p className="text-gray-700 mb-2">Please log in to start calling.</p>
+      <p className="mb-2">Note down your userID before Login:</p>
+      <p className="text-blue-600 font-mono font-semibold mb-4">{username}</p>
       <button
         onClick={onLogin}
         className="bg-[#1B9AAA] text-white px-4 py-2 rounded hover:bg-[#178e8d]"
@@ -18,6 +18,7 @@ const SuccessPopup = ({ onLogin }) => (
     </div>
   </div>
 );
+
 
 const generateUsername = () => {
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
@@ -29,6 +30,9 @@ const generateUsername = () => {
 };
 
 const Signup = ({ onClose, onLoginClick }) => {
+
+  const [userID, setUserID] = useState('');
+
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
@@ -93,7 +97,7 @@ const Signup = ({ onClose, onLoginClick }) => {
     return newUsername;
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e) => { 
     e.preventDefault();
 
     if (!validate()) return;
@@ -107,6 +111,8 @@ const Signup = ({ onClose, onLoginClick }) => {
         email: formData.email.trim(),
         password: formData.password,
       });
+
+      setUserID(username); 
 
       console.log('Signup Success:', response.data);
       setShowSuccess(true);
@@ -213,7 +219,8 @@ const Signup = ({ onClose, onLoginClick }) => {
       </div>
 
       {showSuccess && (
-        <SuccessPopup
+          <SuccessPopup
+          username={userID}
           onLogin={() => {
             setShowSuccess(false);
             onClose();
@@ -221,6 +228,7 @@ const Signup = ({ onClose, onLoginClick }) => {
           }}
         />
       )}
+
     </div>
   );
 };

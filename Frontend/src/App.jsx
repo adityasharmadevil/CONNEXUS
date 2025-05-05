@@ -35,6 +35,8 @@ const AppWrapper = () => {
     navigate('/contacts'); // Redirect to Contact page
   };
 
+  console.log('Login Modal Shown:', showLogin);
+
   return (
     <div className='w-full min-h-screen bg-[#111] relative overflow-x-hidden'>
     {location.pathname !== '/contacts' && (
@@ -73,7 +75,7 @@ const AppWrapper = () => {
       {/* Modals */}
       {showLogin && (
         <Loginpage
-          onClose={() => setShowLogin(false)}
+          onClose={() => setShowLogin(true)}
           onSignupClick={() => {
             setShowLogin(false);
             setShowSignup(true);

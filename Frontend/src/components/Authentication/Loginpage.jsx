@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { X } from "lucide-react";
 import axios from "axios";
 
-function Loginpage({ onClose, onSignupClick }) {
+function Loginpage({ onClose, onSignupClick, onLoginSuccess  }) {
   const [formData, setFormData] = useState({
     usernameOrEmail: '',
     password: '',
@@ -26,18 +26,20 @@ function Loginpage({ onClose, onSignupClick }) {
     e.preventDefault();
     try {
       const response = await axios.post('http://localhost:8080/api/users/login', {
-        username: formData.usernameOrEmail, // assuming backend expects username
+        username: formData.usernameOrEmail,
         password: encryptSHA256(formData.password),
       });
-
+  
       console.log('Login Success:', response.data);
       alert('Login successful!');
       onClose();
+      onLoginSuccess(); 
     } catch (error) {
       console.error('Login Error:', error);
       alert('Login failed! Please check your username and password.');
     }
   };
+  
 
   return (
     <div className='fixed inset-0 z-20 bg-black bg-opacity-60 flex items-center justify-center'>

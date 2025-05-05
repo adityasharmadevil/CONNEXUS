@@ -41,8 +41,23 @@ function Contact() {
     <div className='mainpage'>
       <div className="navbar w-full py-[2vw] px-[3vw]">
         <h1 className="logo font-['Playwrite_IN'] font-semibold text-[2vw]">Connexus</h1>
-        <h1 className='text-[1.2vw]'>Profile</h1>
-      </div>
+        <button className={`transition text-xl ${scrolled ? "hover:underline underline-offset-2" : "hover:text-[#1B9AAA]"}`}>Profile</button>
+            {showProfileMenu && (
+              <div className="absolute top-5 right-0 mt-2 w-40 bg-white text-black rounded shadow-lg py-2 z-50">
+                <Link to="/profile" className="block px-4 py-2 hover:bg-gray-100">My Profile</Link>
+                <Link to="/settings" className="block px-4 py-2 hover:bg-gray-100">Settings</Link>
+                <button 
+                  className="block px-4 py-2 hover:bg-gray-100 w-full text-left"
+                  onClick={() => {
+                    onLogout();         
+                    setShowProfileMenu(false);  
+                    navigate('/');    
+                  }}
+                  >Logout</button>
+              </div>
+            )}
+          </div>
+    
 
       <div className="Call-display flex items-center">
         <div className="left flex flex-col items-center">
