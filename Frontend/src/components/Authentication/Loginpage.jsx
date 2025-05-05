@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { X } from "lucide-react";
 import axios from "axios";
 
-function Loginpage({ onClose, onSignupClick, onLoginSuccess  }) {
+function Loginpage({ onClose, onSignupClick, onLoginSuccess }) {
   const [formData, setFormData] = useState({
     usernameOrEmail: '',
     password: '',
@@ -15,28 +15,22 @@ function Loginpage({ onClose, onSignupClick, onLoginSuccess  }) {
     });
   };
 
-  const [hash, setHash] = useState("");
-  async function encryptSHA256(data) {
-    const encoder = new TextEncoder();
-    const encodedData = encoder.encode(data);
-    const hashBuffer = await crypto.subtle.digest("SHA-256", encodedData);
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
-    const hashHex = hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
-    setHash(hashHex);
-    console.log(hash);
-  }
-    // let passwd=encryptSHA256(formData.password);
-    // console.log(passwd);
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      // Hash the password using SHA-256
+      const encoder = new TextEncoder();
+      const encodedData = encoder.encode(formData.password);
+      const hashBuffer = await crypto.subtle.digest("SHA-256", encodedData);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      const hashHex = hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
+
+      // Send login request with hashed password
       const response = await axios.post('http://localhost:8080/api/users/login', {
         username: formData.usernameOrEmail,
-        // password: encryptSHA256(formData.password),
-        password: formData.password
-        // password:passwd,
+        password: hashHex,
       });
-  
+
       console.log('Login Success:', response.data);
       alert('Login successful!');
       onClose();
@@ -46,7 +40,6 @@ function Loginpage({ onClose, onSignupClick, onLoginSuccess  }) {
       alert('Login failed! Please check your username and password.');
     }
   };
-  
 
   return (
     <div className='fixed inset-0 z-20 bg-black bg-opacity-60 flex items-center justify-center'>
