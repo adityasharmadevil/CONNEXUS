@@ -14,34 +14,36 @@ public class UserService {
     @Autowired
     private UserEntryRepo userRepository;
 
-    //Working but use password hashing
-    //Remove if hashing in not working
+//    Working but use password hashing
+//    Remove if hashing in not working
 
-//    public String registerUser(User user) {
-//        Optional<User> existingUser = userRepository.findByUsername(user.getUsername());
-//        if (existingUser.isPresent()) {
-//            return "Username already taken";
-//        }
-//
-//        // Password stored as plain text — no hashing
-//        userRepository.save(user);
-//        return "User registered successfully!";
-//    }
-//
-//    public String loginUser(User user) {
-//        Optional<User> existingUser = userRepository.findByUsername(user.getUsername());
-//
-//        if (existingUser.isPresent()) {
-//            User dbUser = existingUser.get();
-//            if (dbUser.getPassword().equals(user.getPassword())) {
-//                dbUser.setStatus(true);
-//                userRepository.save(dbUser);
-//                return "Login successful!";
-//            }
-//        }
-//        return "Invalid username or password!";
-//    }
+    public String registerUser(User user) {
+        Optional<User> existingUser = userRepository.findByUsername(user.getUsername());
+        if (existingUser.isPresent()) {
+            return "Username already taken";
+        }
 
+        // Password stored as plain text — no hashing
+        userRepository.save(user);
+        return "User registered successfully!";
+    }
+
+    public String loginUser(User user) {
+        Optional<User> existingUser = userRepository.findByUsername(user.getUsername());
+
+        if (existingUser.isPresent()) {
+            User dbUser = existingUser.get();
+            if (dbUser.getPassword().equals(user.getPassword())) {
+                dbUser.setStatus(true);
+                userRepository.save(dbUser);
+                return "Login successful!";
+            }
+        }
+        return "Invalid username or password!";
+    }
+
+
+/*
     private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
 
@@ -73,5 +75,5 @@ public class UserService {
         }
         return "Invalid username or password!";
     }
-
+*/
 }

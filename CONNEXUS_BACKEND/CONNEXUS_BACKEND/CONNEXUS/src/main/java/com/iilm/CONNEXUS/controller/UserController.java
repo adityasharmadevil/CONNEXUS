@@ -6,6 +6,8 @@ import com.iilm.CONNEXUS.modle.User;
 import com.iilm.CONNEXUS.repository.UserEntryRepo;
 
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 import com.iilm.CONNEXUS.service.UserService;
@@ -33,7 +35,7 @@ public class UserController {
     //         userService.createUser(user);
 
     //         return ResponseEntity.ok("User registered successfully");
-    //     } catch (Exception e) {
+    //     } catc   h (Exception e) {
     //         return ResponseEntity.badRequest().body("Error registering user: " + e.getMessage());
     //     }
     // }
@@ -45,7 +47,7 @@ public class UserController {
 //         }
 //         userService.createUser(user);
 //         return new ResponseEntity<>(HttpStatus.CREATED);
-        
+
 //     }
 //     @PostMapping("/login")
 //     public ResponseEntity<String> loginUser(@RequestBody User user){
@@ -68,14 +70,15 @@ public class UserController {
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping("/login")
-    public ResponseEntity<String> loginUser(@RequestBody User user) {
-        String response = userService.loginUser(user);
-        if (response.equals("Login successful!")) {
-            return ResponseEntity.ok(response);
-        }
-        return ResponseEntity.badRequest().body(response);
-    }
+//    @PostMapping("/login")
+//    public ResponseEntity<String> loginUser(@RequestBody User user) {
+//        String response = userService.loginUser(user);
+//        if (response.equals("Login successful!")) {
+//       // String tempName =   userRepository.
+//            return ResponseEntity.ok(response);
+//        }
+//        return ResponseEntity.badRequest().body(response);
+//    }
 
     @GetMapping("/check-username/{username}")
     public ResponseEntity<?> checkUsernameAvailability(@PathVariable String username) {
@@ -83,5 +86,30 @@ public class UserController {
         return ResponseEntity.ok().body(Collections.singletonMap("available", available));
     }
 
+    //Test Function
+
+    @PostMapping("/login")
+    public ResponseEntity<?> loginUser(@RequestBody User user) {
+        String response = userService.loginUser(user);
+
+        if (response.equals("Login successful!")) {
+            Optional<User> existingUser = userRepository.findByUsername(user.getUsername());
+            if (existingUser.isPresent()) {
+                User dbUser = existingUser.get();
+
+                // Create a map with only username and name
+                Map<String, String> result = new HashMap<>();
+                result.put("username", dbUser.getUsername());
+                result.put("name", dbUser.getName());
+
+                return ResponseEntity.ok(result);
+            }
+        }
+
+        // Return error as JSON
+        return ResponseEntity
+                .badRequest()
+                .body(Collections.singletonMap("message", response));
+    }
 }
 
