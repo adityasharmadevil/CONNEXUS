@@ -14,7 +14,7 @@ public class Session {
     @Id
     private String id;
 
-    private String userId;    // Reference to LomuUser.userId
+    private String userId;
     private String socketId;
 
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
