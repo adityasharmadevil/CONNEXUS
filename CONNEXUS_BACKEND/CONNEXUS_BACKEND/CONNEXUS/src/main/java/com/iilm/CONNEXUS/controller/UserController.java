@@ -4,6 +4,8 @@ package com.iilm.CONNEXUS.controller;
 
 import com.iilm.CONNEXUS.modle.User;
 import com.iilm.CONNEXUS.repository.UserEntryRepo;
+
+import java.util.Collections;
 import java.util.Optional;
 
 import com.iilm.CONNEXUS.service.UserService;
@@ -73,6 +75,12 @@ public class UserController {
             return ResponseEntity.ok(response);
         }
         return ResponseEntity.badRequest().body(response);
+    }
+
+    @GetMapping("/check-username/{username}")
+    public ResponseEntity<?> checkUsernameAvailability(@PathVariable String username) {
+        boolean available = !userRepository.findByUsername(username).isPresent();
+        return ResponseEntity.ok().body(Collections.singletonMap("available", available));
     }
 
 }

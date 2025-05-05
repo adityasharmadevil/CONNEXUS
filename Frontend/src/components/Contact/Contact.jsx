@@ -8,7 +8,7 @@ function Contact() {
   const navigate = useNavigate();
 
   const mockUsers = [
-    { username: 'john1234', fullName: 'John Doe', email: 'john@example.com' },
+    { username: 'JOHN1234', fullName: 'John Doe', email: 'john@example.com' },
     { username: 'alice5678', fullName: 'Alice Smith', email: 'alice@example.com' },
     { username: 'bob4321', fullName: 'Bob Johnson', email: 'bob@example.com' },
   ];
@@ -18,7 +18,8 @@ function Contact() {
   const [error, setError] = useState('');
 
   const handleSearch = () => {
-    const trimmed = searchTerm.trim();
+    const trimmed = searchTerm.trim().toUpperCase();
+
     if (!trimmed) {
       setError('Please enter a user ID.');
       setSearchedUser(null);

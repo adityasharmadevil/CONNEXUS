@@ -20,13 +20,12 @@ const SuccessPopup = ({ onLogin }) => (
 );
 
 const generateUsername = () => {
-  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
   let username = '';
-  for (let i = 0; i < 6; i++) {
+  for (let i = 0; i < 7; i++) {
     username += chars.charAt(Math.floor(Math.random() * chars.length));
   }
-  const digits = Math.floor(1000 + Math.random() * 9000); 
-  return username + digits;
+  return username;
 };
 
 const Signup = ({ onClose, onLoginClick }) => {
@@ -62,7 +61,7 @@ const Signup = ({ onClose, onLoginClick }) => {
       newErrors.email = "Invalid email format";
     }
 
-    if (formData.password.length < 6) {
+    if (formData.password.length < 8) {
       newErrors.password = "Password must be at least 6 characters long";
     }
 
@@ -82,7 +81,7 @@ const Signup = ({ onClose, onLoginClick }) => {
       newUsername = generateUsername();
       try {
         const res = await axios.get(`http://localhost:8080/api/users/check-username/${newUsername}`);
-        if (res.data.available) {
+        if (!res) {
           unique = true;
         }
       } catch (err) {
@@ -106,7 +105,6 @@ const Signup = ({ onClose, onLoginClick }) => {
       const response = await axios.post('http://localhost:8080/api/users/register', {
         fullName: formData.fullName.trim(),
         email: formData.email.trim(),
-        // username,  
         password: formData.password,
       });
 

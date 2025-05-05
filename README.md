@@ -20,7 +20,7 @@ A simple **Video and Audio Calling App** built using **React.js** and **WebRTC**
 - **Frontend:** React.js (with Hooks)
 - **WebRTC:** For peer-to-peer media connection
 - **Signaling Server:** Node.js + Socket.IO
-- **Backend (for signaling only):** Express.js
+- **Backend (for signaling only):** Spring Boot
 
 ---
 
