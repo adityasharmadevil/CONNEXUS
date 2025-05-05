@@ -15,12 +15,15 @@ function Loginpage({ onClose, onSignupClick }) {
     });
   };
 
-  const crypto = require("crypto");
-
-  function encryptSHA256(data) {
-    return crypto.createHash("sha256").update(data).digest("hex");
+  const [hash, setHash] = useState("");
+  async function encryptSHA256(data) {
+    const encoder = new TextEncoder();
+    const encodedData = encoder.encode(data);
+    const hashBuffer = await crypto.subtle.digest("SHA-256", encodedData);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    const hashHex = hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
+    setHash(hashHex);
   }
-
 
   const handleSubmit = async (e) => {
     e.preventDefault();

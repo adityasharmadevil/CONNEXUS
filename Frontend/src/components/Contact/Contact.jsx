@@ -25,7 +25,7 @@ function Contact() {
       return;
     }
 
-    const user = mockUsers.find(user => user.username === trimmed);
+    const user = mockUsers.find(user => user.username === trimmed);// replace by api
     if (user) {
       setSearchedUser(user);
       setError('');
