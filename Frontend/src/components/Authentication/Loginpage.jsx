@@ -15,12 +15,19 @@ function Loginpage({ onClose, onSignupClick }) {
     });
   };
 
+  const crypto = require("crypto");
+
+  function encryptSHA256(data) {
+    return crypto.createHash("sha256").update(data).digest("hex");
+  }
+
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       const response = await axios.post('http://localhost:8080/api/users/login', {
         username: formData.usernameOrEmail, // assuming backend expects username
-        password: formData.password,
+        password: encryptSHA256(formData.password),
       });
 
       console.log('Login Success:', response.data);
