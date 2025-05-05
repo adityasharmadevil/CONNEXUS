@@ -14,8 +14,8 @@ public class Call {
     @Id
     private String id;
 
-    private String callerId;     // Reference to LomuUser.userId
-    private String receiverId;   // Reference to LomuUser.userId
+    private String callerId;
+    private String receiverId;
 
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     private Date startedAt;

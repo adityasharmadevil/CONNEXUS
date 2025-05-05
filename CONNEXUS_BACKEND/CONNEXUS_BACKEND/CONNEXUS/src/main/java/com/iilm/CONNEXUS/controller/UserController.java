@@ -6,6 +6,7 @@ import com.iilm.CONNEXUS.modle.User;
 import com.iilm.CONNEXUS.repository.UserEntryRepo;
 import java.util.Optional;
 
+import com.iilm.CONNEXUS.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,6 +17,8 @@ public class UserController {
 
     @Autowired
     private UserEntryRepo userRepository;
+    @Autowired
+    private UserService userService;
 
     // // 🟢 Register New User
     // @PostMapping("/register")
@@ -54,25 +57,23 @@ public class UserController {
 //     }
 // This is not working as i think so i will update in future , From now this will work
 
-@PostMapping("/register")
-public ResponseEntity<String> registerUser(@RequestBody User user) {
-    Optional<User> existingUser = userRepository.findByUsername(user.getUsername());
-    if (existingUser.isPresent()) {
-        return ResponseEntity.badRequest().body("Username already taken");
+    @PostMapping("/register")
+    public ResponseEntity<String> registerUser(@RequestBody User user) {
+        String response = userService.registerUser(user);
+        if (response.equals("Username already taken")) {
+            return ResponseEntity.badRequest().body(response);
+        }
+        return ResponseEntity.ok(response);
     }
 
-    userRepository.save(user);
-    return ResponseEntity.ok("User registered successfully!");
-}
-@PostMapping("/login")
-public ResponseEntity<String> loginUser(@RequestBody User user) {
-    Optional<User> existingUser = userRepository.findByUsername(user.getUsername());
-    if (existingUser.isPresent() && existingUser.get().getPasswordHash().equals(user.getPasswordHash())) {
-        existingUser.get().setStatus(true);
-        userRepository.save(existingUser.get());
-        return ResponseEntity.ok("Login successful!");
+    @PostMapping("/login")
+    public ResponseEntity<String> loginUser(@RequestBody User user) {
+        String response = userService.loginUser(user);
+        if (response.equals("Login successful!")) {
+            return ResponseEntity.ok(response);
+        }
+        return ResponseEntity.badRequest().body(response);
     }
-    return ResponseEntity.badRequest().body("Invalid username or password!");
-}
+
 }
 
