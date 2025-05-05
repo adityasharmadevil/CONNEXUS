@@ -1,13 +1,26 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import './Callwindow.css';
 import { Video, VideoOff, Mic, MicOff, PhoneOff } from "lucide-react";
 
-const CallWindow = ({ type, onClose }) => {
+const CallWindow = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { user, type = "video" } = location.state || {};
+
   const [videoEnabled, setVideoEnabled] = useState(type === "video");
   const [micEnabled, setMicEnabled] = useState(true);
 
+  useEffect(() => {
+    // If no user info is passed, redirect back
+    if (!user) {
+      navigate('/');
+    }
+  }, [user, navigate]);
+
   const toggleVideo = () => setVideoEnabled(!videoEnabled);
   const toggleMic = () => setMicEnabled(!micEnabled);
+  const handleEndCall = () => navigate('/');
 
   return (
     <div className="main fixed inset-0 bg-black bg-opacity-80 z-50 flex flex-col">
@@ -19,11 +32,11 @@ const CallWindow = ({ type, onClose }) => {
       {/* Call Window */}
       <div className="callbox p-8 rounded-2xl w-[90vw] mx-auto flex flex-col items-center shadow-lg relative">
         <h2 className="text-xl font-semibold mb-2 text-white">
-          {type === "audio" && !videoEnabled ? "Audio Call" : "Video Call"}
+          {type === "audio" && !videoEnabled ? "Audio Call" : "Video Call"} with {user?.fullName}
         </h2>
-        <p className="text-gray-400 mb-6">Connecting...</p>
+        <p className="text-gray-400 mb-6">Connecting to {user?.fullName}...</p>
 
-        {/* Video Preview - Always visible */}
+        {/* Video Preview */}
         <div className="videopreview w-[300px] h-[200px] bg-gray-800 rounded-lg mb-6 flex items-center justify-center border border-gray-600">
           {videoEnabled ? (
             <p className="text-white">[Video Stream Here]</p>
@@ -52,7 +65,7 @@ const CallWindow = ({ type, onClose }) => {
 
           {/* End Call */}
           <button
-            onClick={onClose}
+            onClick={handleEndCall}
             className="bg-red-500 p-3 rounded-full hover:bg-red-600 transition"
           >
             <PhoneOff size={24} className="text-white" />

@@ -1,86 +1,82 @@
-.contact{
-    background: #000;
+.mainpage{
     height: 100vh;
     width: 100%;
-    font-family: 'Poppins';
-    /* display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column; */
-}
-
-.header{
-    height: 15vh;
-    /* background: #b69a9a;  */
-    display: flex;
-    justify-content: start;
-
-}
-
-#logo{
+    background-image: url("src/assests/bgimage.jpg");
+    background-position: center;
     color: white;
-    font-family: "Playwrite IN", serif;
-    font-size: 2rem;
-    padding-left: 5vw;
-    font-weight: bold;
 }
 
-.contact h1{
-    color :white;
-    font-size: 2rem;
+.navbar{
+    background-color: rgb(123, 128, 128);
 }
 
-.contacts{
-    /* background-color: blanchedalmond; */
+.navbar h1{
+    color: white; 
+}
+
+.navbar h1:nth-child(2){
+    font-size: 1.5vw;
+    font-family: "Poppins";
+}
+
+.navbar{
     display: flex;
-    align-items: start;
-    justify-content: center;
-}
-
-.contact-list{
-    height: 70vh;
-    width: 60%;
-    margin: 2vw;
-    padding: 1rem;
-    border:2px solid #1B9AAA;
-    border-radius: 25px ;
-    display: flex;
+    /* flex-direction: column; */
+    justify-content: space-between;
     align-items: center;
-    flex-direction: column; 
+}
+
+.Call-display{
+    display: flex;
+    height: 85vh;
+    width: 100vw;
+    
+}
+
+.left, .right{
+    height: 100%;
+    width: 50%;
+    border: 2px solid white;
 }
 
 .searchbar{
-    height: 9vh;
-    width: 95%;
-    background-color: transparent;
-    margin: 1em;
+    height: 8vh;
+    width: 90%;
+    border: 2px solid white;
     display: flex;
-    justify-content: center;
     align-items: center;
-    margin-bottom:4vh;
-}
+    justify-content: center;
+    border-radius:5px ;
+    
+} 
 
 .searchbar input{
-    height: 100%;
-    width: 100%;
-    border:2px solid #1B9AAA;
-    border-radius: 15px;
-    background: #222;
+    width: 80%;
+    height: 7.8vh;
+    padding-left: 1rem;
+    border: none;
     outline: none;
-    padding: 10px;
-    color:white;
+    border-radius:5px;
 }
 
-.list{
-    width: 95%;
-
+.searchbar button{
+    background-color: #1B9AAA;
+    height: 7.9vh;
+    width: 20%;
 }
 
-
-.user-contact{
+.nametab{
     height: 10vh;
-    width:100% ;
-    border:2px solid grey;
-    border-radius: 15px;
-    
+    width: 90%;
+    border: 2px solid white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 2vh;
+    padding: 0 1vw;
+    border-radius:5px;
+}
+
+.nametab button{
+    height: 8vh;
 }
