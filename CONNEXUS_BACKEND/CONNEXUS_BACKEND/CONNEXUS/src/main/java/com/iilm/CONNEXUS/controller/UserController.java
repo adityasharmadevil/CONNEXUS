@@ -111,5 +111,48 @@ public class UserController {
                 .badRequest()
                 .body(Collections.singletonMap("message", response));
     }
+
+    @GetMapping("/status/{username}")
+    public ResponseEntity<?> checkUserStatus(@PathVariable String username) {
+        Optional<User> user = userRepository.findByUsername(username);
+
+        if (user.isPresent()) {
+            String status = user.get().getStatus(); // "active", "inactive", or "on call"
+            return ResponseEntity.ok(Collections.singletonMap("status", status));
+        }
+
+        return ResponseEntity.badRequest()
+                .body(Collections.singletonMap("message", "User not found"));
+    }
+
+
+
+    @PatchMapping("/status/{username}")
+    public ResponseEntity<?> updateUserStatus(
+            @PathVariable String username,
+            @RequestParam String status) {
+
+        Optional<User> userOpt = userRepository.findByUsername(username);
+
+        if (userOpt.isPresent()) {
+            User user = userOpt.get();
+
+            // Validate status input
+            if (!status.equalsIgnoreCase("active") &&
+                    !status.equalsIgnoreCase("inactive") &&
+                    !status.equalsIgnoreCase("on call")) {
+                return ResponseEntity.badRequest()
+                        .body(Collections.singletonMap("message", "Invalid status value. Allowed: active, inactive, on call"));
+            }
+
+            user.setStatus(status.toLowerCase()); // Normalize status to lowercase
+            userRepository.save(user);
+
+            return ResponseEntity.ok(Collections.singletonMap("message", "Status updated successfully"));
+        }
+
+        return ResponseEntity.badRequest().body(Collections.singletonMap("message", "User not found"));
+    }
+
 }
 

@@ -33,12 +33,19 @@ public class UserService {
 
         if (existingUser.isPresent()) {
             User dbUser = existingUser.get();
+
+            // Check if password matches
             if (dbUser.getPassword().equals(user.getPassword())) {
-                dbUser.setStatus(true);
+                // Set status to "active" on successful login
+                dbUser.setStatus("active");
+
+                // Save the updated user object in the repository
                 userRepository.save(dbUser);
+
                 return "Login successful!";
             }
         }
+
         return "Invalid username or password!";
     }
 
