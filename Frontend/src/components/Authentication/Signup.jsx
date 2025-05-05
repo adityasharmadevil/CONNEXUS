@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { X } from "lucide-react";
 import axios from "axios";
 
-
+// Success popup shown after successful signup
 const SuccessPopup = ({ onLogin, username }) => (
   <div className="fixed inset-0 z-30 bg-black bg-opacity-60 flex items-center justify-center">
     <div className="bg-white rounded-lg p-6 shadow-lg max-w-sm w-full text-center">
@@ -20,7 +20,6 @@ const SuccessPopup = ({ onLogin, username }) => (
   </div>
 );
 
-
 const generateUsername = () => {
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
   let username = '';
@@ -31,9 +30,6 @@ const generateUsername = () => {
 };
 
 const Signup = ({ onClose, onLoginClick }) => {
-
-  const [userID, setUserID] = useState('');
-
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
@@ -42,52 +38,31 @@ const Signup = ({ onClose, onLoginClick }) => {
   });
 
   const [errors, setErrors] = useState({});
-  const [showSuccess, setShowSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [userID, setUserID] = useState('');
   const [serverError, setServerError] = useState('');
 
-
   const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const validate = () => {
-    const newErrors = {};
-
-    if (!formData.fullName.trim()) {
-      newErrors.fullName = "Full name is required";
-    }
-
-    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailPattern.test(formData.email)) {
-      newErrors.email = "Invalid email format";
-    }
-
-    if (formData.password.length < 8) {
-      newErrors.password = "Password must be at least 6 characters long";
-    }
-
-    if (formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = "Passwords do not match";
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+  const encryptSHA256 = async (data) => {
+    const encoder = new TextEncoder();
+    const encodedData = encoder.encode(data);
+    const hashBuffer = await crypto.subtle.digest("SHA-256", encodedData);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
   };
 
   const getUniqueUsername = async () => {
     let unique = false;
     let newUsername = '';
- 
+
     while (!unique) {
       newUsername = generateUsername();
       try {
         const res = await axios.get(`http://localhost:8080/api/users/check-username/${newUsername}`);
- 
-        // Assuming your backend returns { available: true } if it's unique
         if (res.data.available) {
           unique = true;
         }
@@ -96,32 +71,49 @@ const Signup = ({ onClose, onLoginClick }) => {
         break;
       }
     }
- 
+
     return newUsername;
   };
 
-  const handleSubmit = async (e) => { 
-    e.preventDefault();
+  const validate = () => {
+    const newErrors = {};
 
+    if (!formData.fullName.trim()) newErrors.fullName = "Full name is required";
+
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailPattern.test(formData.email)) newErrors.email = "Invalid email format";
+
+    if (formData.password.length < 8) newErrors.password = "Password must be at least 8 characters";
+
+    if (formData.password !== formData.confirmPassword) newErrors.confirmPassword = "Passwords do not match";
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     if (!validate()) return;
 
     setLoading(true);
+    setServerError('');
 
     try {
+      const hashedPassword = await encryptSHA256(formData.password);
       const username = await getUniqueUsername();
+
       const response = await axios.post('http://localhost:8080/api/users/register', {
-        fullName: formData.fullName.trim(),
-        email: formData.email.trim(),
-        password: formData.password,
+        fullName: formData.fullName,
+        email: formData.email,
+        password: hashedPassword,
+        username: username
       });
 
-      setUserID(username); 
-
+      setUserID(username);
       console.log('Signup Success:', response.data);
       setShowSuccess(true);
     } catch (error) {
-      console.error('Signup Error:', error);
-      // alert('Signup failed! Please try again.');
+      console.error('Signup Error:', error.response?.data || error.message);
       setServerError(error.response?.data?.message || "Signup failed. Please try again.");
     } finally {
       setLoading(false);
@@ -141,67 +133,62 @@ const Signup = ({ onClose, onLoginClick }) => {
         <h2 className="text-xl font-semibold text-white mb-6">Create your account</h2>
 
         <form className="space-y-4" onSubmit={handleSubmit}>
-          <div>
-            <input
-              type="text"
-              name="fullName"
-              placeholder="Full Name"
-              value={formData.fullName}
-              onChange={handleChange}
-              className="w-full px-4 py-2 text-white bg-zinc-700 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500"
-            />
-            {errors.fullName && <p className="text-red-400 text-sm mt-1">{errors.fullName}</p>}
-          </div>
+          <input
+            type="text"
+            name="fullName"
+            placeholder="Full Name"
+            value={formData.fullName}
+            onChange={handleChange}
+            className="w-full px-4 py-2 text-white bg-zinc-700 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500"
+          />
+          {errors.fullName && <p className="text-red-400 text-sm mt-1">{errors.fullName}</p>}
 
-          <div>
-            <input
-              type="email"
-              name="email"
-              placeholder="Email"
-              value={formData.email}
-              onChange={handleChange}
-              className="w-full px-4 py-2 text-white bg-zinc-700 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500"
-            />
-            {errors.email && <p className="text-red-400 text-sm mt-1">{errors.email}</p>}
-          </div>
+          <input
+            type="email"
+            name="email"
+            placeholder="Email"
+            value={formData.email}
+            onChange={handleChange}
+            className="w-full px-4 py-2 text-white bg-zinc-700 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500"
+          />
+          {errors.email && <p className="text-red-400 text-sm mt-1">{errors.email}</p>}
 
-          <div>
-            <input
-              type="password"
-              name="password"
-              placeholder="Password"
-              value={formData.password}
-              onChange={handleChange}
-              className="w-full px-4 py-2 text-white bg-zinc-700 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500"
-            />
-            {errors.password && <p className="text-red-400 text-sm mt-1">{errors.password}</p>}
-          </div>
+          <input
+            type="password"
+            name="password"
+            placeholder="Password"
+            value={formData.password}
+            onChange={handleChange}
+            className="w-full px-4 py-2 text-white bg-zinc-700 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500"
+          />
+          {errors.password && <p className="text-red-400 text-sm mt-1">{errors.password}</p>}
 
-          <div>
-            <input
-              type="password"
-              name="confirmPassword"
-              placeholder="Confirm Password"
-              value={formData.confirmPassword}
-              onChange={handleChange}
-              className="w-full px-4 py-2 text-white bg-zinc-700 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500"
-            />
-            {errors.confirmPassword && <p className="text-red-400 text-sm mt-1">{errors.confirmPassword}</p>}
-          </div>
+          <input
+            type="password"
+            name="confirmPassword"
+            placeholder="Confirm Password"
+            value={formData.confirmPassword}
+            onChange={handleChange}
+            className="w-full px-4 py-2 text-white bg-zinc-700 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500"
+          />
+          {errors.confirmPassword && <p className="text-red-400 text-sm mt-1">{errors.confirmPassword}</p>}
 
           <button
             type="submit"
-            className={`w-full flex items-center justify-center bg-[#1B9AAA] text-white py-2 rounded-md ${loading ? 'opacity-70 cursor-not-allowed' : 'hover:bg-cyan-700 hover:shadow-lg shadow-cyan-700'} transition`}
+            className={`w-full flex items-center justify-center bg-[#1B9AAA] text-white py-2 rounded-md ${
+              loading ? 'opacity-70 cursor-not-allowed' : 'hover:bg-cyan-700 hover:shadow-lg shadow-cyan-700'
+            } transition`}
             disabled={loading}
           >
-            
             {loading ? (
-              <svg className="animate-spin h-5 w-5 mr-2 text-white" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
-              </svg>
-            ) : null}
-            {loading ? 'Signing Up...' : 'Sign Up'}
+              <>
+                <svg className="animate-spin h-5 w-5 mr-2 text-white" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
+                </svg>
+                Signing Up...
+              </>
+            ) : 'Sign Up'}
           </button>
 
           {serverError && <p className="text-red-400 text-sm mt-2 text-center">{serverError}</p>}
@@ -222,7 +209,7 @@ const Signup = ({ onClose, onLoginClick }) => {
       </div>
 
       {showSuccess && (
-          <SuccessPopup
+        <SuccessPopup
           username={userID}
           onLogin={() => {
             setShowSuccess(false);
@@ -231,7 +218,6 @@ const Signup = ({ onClose, onLoginClick }) => {
           }}
         />
       )}
-
     </div>
   );
 };

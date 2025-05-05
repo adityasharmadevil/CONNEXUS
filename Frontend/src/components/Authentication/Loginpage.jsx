@@ -2,9 +2,9 @@ import React, { useState } from 'react';
 import { X } from "lucide-react";
 import axios from "axios";
 
-function Loginpage({ onClose, onSignupClick, onLoginSuccess  }) {
+function Loginpage({ onClose, onSignupClick, onLoginSuccess }) {
   const [formData, setFormData] = useState({
-    usernameOrEmail: '',
+    usernameOrEmail: '',  // Masked field for either username or email input
     password: '',
   });
 
@@ -15,59 +15,60 @@ function Loginpage({ onClose, onSignupClick, onLoginSuccess  }) {
     });
   };
 
-  const [hash, setHash] = useState("");
-  async function encryptSHA256(data) {
+  const hashPassword = async (password) => {
     const encoder = new TextEncoder();
-    const encodedData = encoder.encode(data);
-    const hashBuffer = await crypto.subtle.digest("SHA-256", encodedData);
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
-    const hashHex = hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
-    setHash(hashHex);
-    console.log(hash);
-  }
-    // let passwd=encryptSHA256(formData.password);
-    // console.log(passwd);
+    const encoded = encoder.encode(password);
+    const buffer = await crypto.subtle.digest("SHA-256", encoded);
+    return Array.from(new Uint8Array(buffer))
+      .map(b => b.toString(16).padStart(2, "0"))
+      .join("");
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     try {
-      const response = await axios.post('http://localhost:8080/api/users/login', {
-        username: formData.usernameOrEmail,
-        // password: encryptSHA256(formData.password),
-        password: formData.password
-        // password:passwd,
-      });
-  
+      // Hash password before sending
+      const hashedPassword = await hashPassword(formData.password);
+
+      // Prepare payload (sending only username for backend)
+      const payload = {
+        username: formData.usernameOrEmail,  // We send usernameOrEmail (masked field)
+        password: hashedPassword,
+      };
+
+      const response = await axios.post('http://localhost:8080/api/users/login', payload);
+
       console.log('Login Success:', response.data);
       alert('Login successful!');
       onClose();
-      onLoginSuccess(); 
+      onLoginSuccess();
+
     } catch (error) {
-      console.error('Login Error:', error);
-      alert('Login failed! Please check your username and password.');
+      const message = error?.response?.data || "Login failed! Please try again.";
+      console.error('Login Error:', message);
+      alert(message);
     }
   };
-  
 
   return (
     <div className='fixed inset-0 z-20 bg-black bg-opacity-60 flex items-center justify-center'>
       <div className="loginform p-6 bg-zinc-800 rounded-lg relative w-[90%] max-w-md">
-        {/* Close Button */}
         <button onClick={onClose} className="absolute top-4 right-4 text-gray-400 hover:text-white">
           <X size={24} />
         </button>
 
-        {/* Logo */}
         <div className="text-white text-2xl font-bold mb-4 text-center font-['Playwrite_IN']">Connexus</div>
 
-        {/* Form */}
         <form onSubmit={handleSubmit} className="w-full flex flex-col gap-4">
           <input
             className='w-full p-3 text-white bg-zinc-700 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500'
             type="text"
-            name="usernameOrEmail"
-            placeholder='Username'
+            name="usernameOrEmail"  // The input field can handle both username and email
+            placeholder='Username or Email'
             value={formData.usernameOrEmail}
             onChange={handleChange}
+            required
           />
           <input
             className='w-full p-3 text-white bg-zinc-700 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500'
@@ -76,6 +77,7 @@ function Loginpage({ onClose, onSignupClick, onLoginSuccess  }) {
             placeholder='Password'
             value={formData.password}
             onChange={handleChange}
+            required
           />
 
           <div className='text-sm text-right text-white'>
