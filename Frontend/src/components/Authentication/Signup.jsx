@@ -113,6 +113,7 @@ const Signup = ({ onClose, onLoginClick }) => {
         fullName: formData.fullName.trim(),
         email: formData.email.trim(),
         password: formData.password,
+        username: username
       });
 
       setUserID(username); 

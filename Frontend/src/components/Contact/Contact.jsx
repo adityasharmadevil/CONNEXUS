@@ -3,7 +3,7 @@ import './Contact.css';
 import { useNavigate, Link } from 'react-router-dom'; 
  
 
-function Contact() {
+function Contact({onLogout}) {
 
   const navigate = useNavigate();
   const [showProfileMenu, setShowProfileMenu] = useState(false);
