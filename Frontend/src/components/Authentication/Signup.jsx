@@ -20,13 +20,13 @@ const SuccessPopup = ({ onLogin }) => (
 );
 
 const generateUsername = () => {
-  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
   let username = '';
-  for (let i = 0; i < 6; i++) {
+  for (let i = 0; i < 7; i++) {
     username += chars.charAt(Math.floor(Math.random() * chars.length));
   }
-  const digits = Math.floor(1000 + Math.random() * 9000); 
-  return username + digits;
+  // const digits = Math.floor(1000 + Math.random() * 9000); 
+  return username;
 };
 
 const Signup = ({ onClose, onLoginClick }) => {

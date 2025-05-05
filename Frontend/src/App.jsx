@@ -22,8 +22,9 @@ const AppWrapper = () => {
 
   useEffect(() => {
     fetch('http://localhost:8080/api/hello')
-      .then(response => response.text())
-      .then(data => setBackendMessage(data))
+      // .then(response => response.text())
+      .then(alert("backend active"))
+      // .then(data => setBackendMessage(data))
       .catch(error => console.error('Error fetching backend message:', error));
   }, []);
 
