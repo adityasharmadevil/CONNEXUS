@@ -21,7 +21,7 @@ public class User {
     private String phone;
     private String password;
     private String name;
-    private boolean status;
+    private String status;
 
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     private Date createdAt;
