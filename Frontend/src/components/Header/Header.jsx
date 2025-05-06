@@ -1,11 +1,10 @@
 import { useEffect, useState } from "react";
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Link } from "react-router-dom";
 
-function Header({ onLoginClick, onSignupClick, isLoggedIn, onLogout }) {
+
+function Header({ onLoginClick, onSignupClick, }) {
   const [scrolled, setScrolled] = useState(false);
-  const [showProfileMenu, setShowProfileMenu] = useState(false);
   const navigate = useNavigate(); 
 
   useEffect(() => {
@@ -25,13 +24,13 @@ function Header({ onLoginClick, onSignupClick, isLoggedIn, onLogout }) {
         <h1 className='font-semibold text-[2vw]'>Connexus</h1>
       </div>
 
-      {!isLoggedIn ? (
+      
         <div className="authentication font-[Poppins]">
           <button className='login text-white bg-none mr-6' onClick={onLoginClick}>Login</button>
           <button className={`signup py-2 px-2 text-[#1B9AAA] border-2 rounded-md transition-all duration-300 ${scrolled ? "bg-[#1B9AAA] text-white border-white hover:bg-[#188795] hover:bg-cyan-700" : "bg-[#1B9AAA] text-white border-[#1B9AAA] hover:bg-cyan-700 hover:border-cyan-700 hover:shadow-lg shadow-cyan-700"}`} onClick={onSignupClick}>Sign up</button>
         </div>
-      ) : (
-        <div className="navbar flex items-center gap-8 text-white font-[Poppins] relative">
+      
+        {/* <div className="navbar flex items-center gap-8 text-white font-[Poppins] relative">
           <Link 
               to="/" 
               className={`transition text-xl ${scrolled ? "hover:underline underline-offset-2" : "hover:text-[#1B9AAA]"}`}
@@ -72,8 +71,8 @@ function Header({ onLoginClick, onSignupClick, isLoggedIn, onLogout }) {
             )}
           </div>
         </div>
-      )}
-    </div>
+      )}*/}
+    </div> 
   );
 }
 
