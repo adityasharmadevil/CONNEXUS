@@ -24,15 +24,18 @@ function Loginpage({ onClose, onSignupClick, onLoginSuccess }) {
       const hashBuffer = await crypto.subtle.digest("SHA-256", encodedData);
       const hashArray = Array.from(new Uint8Array(hashBuffer));
       const hashHex = hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
-
-      // Send login request with hashed password
+  
       const response = await axios.post('http://localhost:8080/api/users/login', {
         username: formData.usernameOrEmail,
         password: hashHex,
+        // password: password,
       });
-
+  
       console.log('Login Success:', response.data);
       alert('Login successful!');
+  
+      localStorage.setItem('username', formData.usernameOrEmail);
+
       onClose();
       onLoginSuccess(); 
     } catch (error) {
@@ -40,7 +43,7 @@ function Loginpage({ onClose, onSignupClick, onLoginSuccess }) {
       alert('Login failed! Please check your username and password.');
     }
   };
-
+  
   return (
     <div className='fixed inset-0 z-20 bg-black bg-opacity-60 flex items-center justify-center'>
       <div className="loginform p-6 bg-zinc-800 rounded-lg relative w-[90%] max-w-md">

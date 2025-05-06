@@ -34,9 +34,11 @@ const AppWrapper = () => {
   }, []);
 
   const handleLogout = () => {
-    localStorage.clear();
+    localStorage.removeItem("token");
+    setIsLoggedIn(false);
     console.log("Logged out");
   };
+  
 
   const handleLoginSuccess = () => {
     setIsLoggedIn(true);

@@ -89,3 +89,8 @@
 .nametab button{
     height: 8vh;
 }
+
+.recentCalls{
+    min-height:40vh ;
+    width: 90%;
+}
