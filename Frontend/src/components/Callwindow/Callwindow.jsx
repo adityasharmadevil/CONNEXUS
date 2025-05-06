@@ -21,31 +21,27 @@ const CallWindow = () => {
 
   const YOUR_ID = "caller-unique-id"; // Replace with actual caller ID logic
 
-  // Request camera and mic permissions when the component mounts
   useEffect(() => {
     if (!user) {
       navigate('/');
       return;
     }
 
-    // Automatically enable video and mic when the window opens
     setVideoEnabled(true);
     setMicEnabled(true);
     
-    checkUserStatusAndStartCall(user.uniqueId);
-    requestMediaPermissions(); // Request camera and mic permissions
+    requestMediaPermissions();
+    setupWebSocket();
   }, [user]);
 
-  // Function to request camera and mic permissions
   const requestMediaPermissions = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ video: videoEnabled, audio: micEnabled });
-      // Set the local stream to the local video element
       if (localVideoRef.current) {
-        localVideoRef.current.srcObject = stream; // Display the local video
-        localVideoRef.current.muted = true; // Mute the local video to prevent feedback
+        localVideoRef.current.srcObject = stream;
+        localVideoRef.current.muted = true;
       }
-      setPermissionsGranted(true); // Set permission as granted once stream is received
+      setPermissionsGranted(true);
       stream.getTracks().forEach(track => peerConnection.current.addTrack(track, stream));
     } catch (err) {
       console.error("Error accessing media devices", err);
@@ -53,40 +49,12 @@ const CallWindow = () => {
     }
   };
 
-  const checkUserStatusAndStartCall = async (userId) => {
-    const res = await fetch(`http://localhost:8080/api/status/${userId}`);
-    const data = await res.json();
-    if (data.status === "active") {
-      initiateCallSession();
-    } else {
-      alert("User is not active. Call cannot be placed.");
-      navigate('/contacts');
-    }
-  };
+  const setupWebSocket = () => {
+    signalingServer.current = new WebSocket("ws://localhost:8080/ws");
 
-  const initiateCallSession = async () => {
-    const response = await fetch(`http://localhost:8080/api/calls/start`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ callerId: YOUR_ID, receiverId: user.uniqueId })
-    });
-
-    const session = await response.json();
-    setSessionId(session.sessionId);
-    setCallStartTime(new Date());
-    setupWebRTC();
-  };
-
-  const setupWebRTC = () => {
-    peerConnection.current = new RTCPeerConnection({
-      iceServers: [{ urls: "stun:stun.l.google.com:19302" }]
-    });
-
-    peerConnection.current.ontrack = (event) => {
-      remoteVideoRef.current.srcObject = event.streams[0];
+    signalingServer.current.onopen = () => {
+      console.log("WebSocket connected!");
     };
-
-    signalingServer.current = new WebSocket("ws://localhost:5000/ws");
 
     signalingServer.current.onmessage = async (event) => {
       const data = JSON.parse(event.data);
@@ -102,10 +70,12 @@ const CallWindow = () => {
       }
     };
 
-    peerConnection.current.onicecandidate = (event) => {
-      if (event.candidate) {
-        signalingServer.current.send(JSON.stringify({ type: "candidate", candidate: event.candidate }));
-      }
+    peerConnection.current = new RTCPeerConnection({
+      iceServers: [{ urls: "stun:stun.l.google.com:19302" }]
+    });
+
+    peerConnection.current.ontrack = (event) => {
+      remoteVideoRef.current.srcObject = event.streams[0];
     };
   };
 
@@ -122,32 +92,11 @@ const CallWindow = () => {
   };
 
   const handleEndCall = async () => {
-    const endTime = new Date();
-    const duration = Math.floor((endTime - callStartTime) / 1000); // in seconds
-
-    await fetch(`http://localhost:8080/api/calls/end/${sessionId}`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        endTime: endTime.toISOString(),
-        duration
-      })
-    });
-
     if (peerConnection.current) peerConnection.current.close();
     if (signalingServer.current) signalingServer.current.close();
-
     alert("Call Ended");
     navigate('/contacts');
   };
-
-  if (!permissionsGranted) {
-    return (
-      <div className="main flex items-center justify-center text-white">
-        <h2>Please grant permission to access your camera and microphone.</h2>
-      </div>
-    );
-  }
 
   return (
     <div className="main fixed inset-0 bg-black bg-opacity-80 z-50 flex flex-col">
