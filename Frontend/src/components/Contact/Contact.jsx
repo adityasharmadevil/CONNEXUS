@@ -75,7 +75,7 @@ function Contact({ onLogout }) {
         <div className="flex items-center space-x-6 font-[Poppins]">
           {/* ✅ Display Username if available */}
           {username && (
-            <span className="text-white text-lg">Hi, <span className="font-semibold text-cyan-400">{username}</span></span>
+            <span className="text-white text-lg">userID : <span className="font-semibold text-cyan-400">{username}</span></span>
           )}
 
           <div
