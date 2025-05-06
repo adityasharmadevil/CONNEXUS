@@ -20,7 +20,6 @@ const SuccessPopup = ({ onLogin, username }) => (
   </div>
 );
 
-// Generates random 7-character alphanumeric username
 const generateUsername = () => {
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
   let username = '';
@@ -45,10 +44,7 @@ const Signup = ({ onClose, onLoginClick }) => {
   const [serverError, setServerError] = useState('');
 
   const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const encryptSHA256 = async (data) => {
@@ -56,8 +52,7 @@ const Signup = ({ onClose, onLoginClick }) => {
     const encodedData = encoder.encode(data);
     const hashBuffer = await crypto.subtle.digest("SHA-256", encodedData);
     const hashArray = Array.from(new Uint8Array(hashBuffer));
-    const hashHex = hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
-    return hashHex;
+    return hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
   };
 
   const getUniqueUsername = async () => {
@@ -83,22 +78,14 @@ const Signup = ({ onClose, onLoginClick }) => {
   const validate = () => {
     const newErrors = {};
 
-    if (!formData.fullName.trim()) {
-      newErrors.fullName = "Full name is required";
-    }
+    if (!formData.fullName.trim()) newErrors.fullName = "Full name is required";
 
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailPattern.test(formData.email)) {
-      newErrors.email = "Invalid email format";
-    }
+    if (!emailPattern.test(formData.email)) newErrors.email = "Invalid email format";
 
-    if (formData.password.length < 8) {
-      newErrors.password = "Password must be at least 8 characters long";
-    }
+    if (formData.password.length < 8) newErrors.password = "Password must be at least 8 characters";
 
-    if (formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = "Passwords do not match";
-    }
+    if (formData.password !== formData.confirmPassword) newErrors.confirmPassword = "Passwords do not match";
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -106,10 +93,10 @@ const Signup = ({ onClose, onLoginClick }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     if (!validate()) return;
 
     setLoading(true);
+    setServerError('');
 
     try {
       const hashedPassword = await encryptSHA256(formData.password);
@@ -146,57 +133,51 @@ const Signup = ({ onClose, onLoginClick }) => {
         <h2 className="text-xl font-semibold text-white mb-6">Create your account</h2>
 
         <form className="space-y-4" onSubmit={handleSubmit}>
-          <div>
-            <input
-              type="text"
-              name="fullName"
-              placeholder="Full Name"
-              value={formData.fullName}
-              onChange={handleChange}
-              className="w-full px-4 py-2 text-white bg-zinc-700 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500"
-            />
-            {errors.fullName && <p className="text-red-400 text-sm mt-1">{errors.fullName}</p>}
-          </div>
+          <input
+            type="text"
+            name="fullName"
+            placeholder="Full Name"
+            value={formData.fullName}
+            onChange={handleChange}
+            className="w-full px-4 py-2 text-white bg-zinc-700 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500"
+          />
+          {errors.fullName && <p className="text-red-400 text-sm mt-1">{errors.fullName}</p>}
 
-          <div>
-            <input
-              type="email"
-              name="email"
-              placeholder="Email"
-              value={formData.email}
-              onChange={handleChange}
-              className="w-full px-4 py-2 text-white bg-zinc-700 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500"
-            />
-            {errors.email && <p className="text-red-400 text-sm mt-1">{errors.email}</p>}
-          </div>
+          <input
+            type="email"
+            name="email"
+            placeholder="Email"
+            value={formData.email}
+            onChange={handleChange}
+            className="w-full px-4 py-2 text-white bg-zinc-700 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500"
+          />
+          {errors.email && <p className="text-red-400 text-sm mt-1">{errors.email}</p>}
 
-          <div>
-            <input
-              type="password"
-              name="password"
-              placeholder="Password"
-              value={formData.password}
-              onChange={handleChange}
-              className="w-full px-4 py-2 text-white bg-zinc-700 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500"
-            />
-            {errors.password && <p className="text-red-400 text-sm mt-1">{errors.password}</p>}
-          </div>
+          <input
+            type="password"
+            name="password"
+            placeholder="Password"
+            value={formData.password}
+            onChange={handleChange}
+            className="w-full px-4 py-2 text-white bg-zinc-700 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500"
+          />
+          {errors.password && <p className="text-red-400 text-sm mt-1">{errors.password}</p>}
 
-          <div>
-            <input
-              type="password"
-              name="confirmPassword"
-              placeholder="Confirm Password"
-              value={formData.confirmPassword}
-              onChange={handleChange}
-              className="w-full px-4 py-2 text-white bg-zinc-700 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500"
-            />
-            {errors.confirmPassword && <p className="text-red-400 text-sm mt-1">{errors.confirmPassword}</p>}
-          </div>
+          <input
+            type="password"
+            name="confirmPassword"
+            placeholder="Confirm Password"
+            value={formData.confirmPassword}
+            onChange={handleChange}
+            className="w-full px-4 py-2 text-white bg-zinc-700 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500"
+          />
+          {errors.confirmPassword && <p className="text-red-400 text-sm mt-1">{errors.confirmPassword}</p>}
 
           <button
             type="submit"
-            className={`w-full flex items-center justify-center bg-[#1B9AAA] text-white py-2 rounded-md ${loading ? 'opacity-70 cursor-not-allowed' : 'hover:bg-cyan-700 hover:shadow-lg shadow-cyan-700'} transition`}
+            className={`w-full flex items-center justify-center bg-[#1B9AAA] text-white py-2 rounded-md ${
+              loading ? 'opacity-70 cursor-not-allowed' : 'hover:bg-cyan-700 hover:shadow-lg shadow-cyan-700'
+            } transition`}
             disabled={loading}
           >
             {loading ? (

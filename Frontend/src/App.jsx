@@ -32,7 +32,7 @@ const AppWrapper = () => {
       .then(res => console.log(res.data))
       .catch(err => console.error(err));
   }, []);
-
+  
   const handleLogout = () => {
     localStorage.removeItem("token");
     setIsLoggedIn(false);
@@ -71,7 +71,7 @@ const AppWrapper = () => {
           path="/"
           element={
             <>
-              <LandingPage onLoginClick={() => setShowLogin(true)} />
+              <LandingPage />
               <About />
               <SecuritySection />
               <Working />
@@ -79,7 +79,7 @@ const AppWrapper = () => {
             </>
           }
         />
-        <Route path="/contacts" element={<Contact onLogout={handleLogout}/>} />
+        <Route path="/contacts" element={<Contact onLogout={handleLogout} />} />
         <Route path="/callwindow" element={<CallWindow />} />
       </Routes>
 

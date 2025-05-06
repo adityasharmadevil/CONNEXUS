@@ -4,6 +4,8 @@ import com.iilm.CONNEXUS.modle.User;
 import com.iilm.CONNEXUS.repository.UserEntryRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import java.util.Optional;
 
 @Service

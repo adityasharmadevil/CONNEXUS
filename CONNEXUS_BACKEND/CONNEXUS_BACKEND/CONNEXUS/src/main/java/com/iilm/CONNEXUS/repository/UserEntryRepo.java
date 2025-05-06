@@ -1,4 +1,5 @@
 package com.iilm.CONNEXUS.repository;
+import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 import com.iilm.CONNEXUS.modle.User;
