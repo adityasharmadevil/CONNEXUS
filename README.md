@@ -8,7 +8,7 @@ Connexus is a modern, full-stack video calling and team collaboration web applic
 ## 🚀 Tech Stack
 
 ### Backend
-* **Java 17+** / **Spring Boot**
+* **Java 18+** / **Spring Boot**
 * **Spring Security** (OAuth2 Resource Server / JWT Authentication)
 * **Spring Data JPA** & **Hibernate**
 * **Supabase PostgreSQL Database**
